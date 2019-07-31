@@ -7,16 +7,22 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.4'
-#       jupytext_version: 1.1.6
+#       jupytext_version: 1.1.3
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
 #     name: python3
 # ---
 
-# * There are alternative solution : 
-# * more readable, more effient (vectorlized)
-# * L10
+# * There are alternative solution and hits: 
+# * more readable
+# > 10
+# * more effient (vectorlized)
+# > 16
+# * when to use it?
+# > 13
+# * hints
+# > 12
 
 import pandas as pd
 
@@ -124,15 +130,43 @@ ser = pd.Series(np.random.randint(1, 10, 35))
 pd.DataFrame(ser.values.reshape(7,-1))
 
 # +
-# 13
+# 13. How to find the positions of numbers that are multiples of 3 from a series?
+# L2
+ser = pd.Series(np.random.randint(1, 10, 7))
+
+# note : np.where, pd.where return whole series
+#        np.argwhere return index
+#        use the indrx :  arr = np.argwhere(ser condition), ser.iloc(arr.reshape(-1))
+np.argwhere(ser % 3 == 0)
+
+# +
+# 14. How to extract items at given positions from a series
+# L1
+ser = pd.Series(list('abcdefghijklmnopqrstuvwxyz'))
+pos = [0, 4, 8, 14, 20]
+
+ser.iloc[pos]
+
+# +
+# 15. How to stack two series vertically and horizontally ?
+# Difficulty Level: L1
+ser1 = pd.Series(range(5))
+ser2 = pd.Series(list('abcde'))
+
+df1 = pd.concat([ser1,ser2], axis=0).to_frame()
+df2 = pd.concat([ser1,ser2], axis=1)
+
+# +
+# 16. How to get the positions of items of series A in another series B?
+# Difficulty Level: L2
+ser1 = pd.Series([10, 9, 6, 5, 3, 1, 12, 8, 13])
+ser2 = pd.Series([1, 3, 10, 13])
+
+# note : this solution is vectorlized
+# faster than list comprehemsion for i in ser2 
+# when data is big
+np.argwhere(ser1.isin(ser2)).reshape(-1).tolist()
 # -
-
-
-
-
-
-
-
 
 
 
