@@ -26,7 +26,7 @@
 ## 如何使用 ? 
 初學Data Science, Machine Learning : 
 * 從[Pandas 101](https://www.machinelearningplus.com/python/101-pandas-exercises-python/)，規劃1-3個月不等，每天3-5題
-  鍛鍊出一個更好的自己
+  鍛鍊出一個更好的自己。
 
 有經驗的Data Scientist : 
 * 翻找一些[pandas trick](#trick)，讓自己的工作更有效率。
