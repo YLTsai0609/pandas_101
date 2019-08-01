@@ -16,13 +16,13 @@
 
 # * There are alternative solution and hits: 
 # * more readable
-# > 10
+# > 10, 18
 # * more effient (vectorlized)
-# > 16
+# > 16, 19
 # * when to use it?
 # > 13
 # * hints
-# > 12
+# > 12, 18
 
 import pandas as pd
 
@@ -166,18 +166,53 @@ ser2 = pd.Series([1, 3, 10, 13])
 # faster than list comprehemsion for i in ser2 
 # when data is big
 np.argwhere(ser1.isin(ser2)).reshape(-1).tolist()
+# + {}
+# 17. How to compute the mean squared error on a truth and predicted series?
+# Difficulty Level: L2
+truth = pd.Series(range(10))
+pred = pd.Series(range(10)) + np.random.random(10)
+
+print((truth - pred).pow(2).sum() / len(truth))
+print(np.mean((truth - pred) ** 2))
+
+# +
+# 18. How to convert the first character of each element in a series to uppercase?
+# Difficulty Level: L2
+ser = pd.Series(['how', 'to', 'kick', 'ass?'])
+
+# More readable
+ser.str.capitalize()
+# Hints
+# you can use dir() to get all the method inside ser.str
+# Now you could faster understand how ser.str can do
+# print(dir(ser.str))
+
+# +
+# 19. How to calculate the number of characters in each word in a series?
+# Difficulty Level: L2
+ser = pd.Series(['how', 'to', 'kick', 'ass?'])
+
+# vectorlzied
+
+ser.str.len()
+
+# +
+# 20. How to compute difference of differences between consequtive numbers of a series?
+# Difficulty Level: L1
+ser = pd.Series([1, 3, 6, 10, 15, 21, 27, 35])
+
+# Solition 1
+tmp = ser.shift(1)
+middle_result = ser - tmp
+print(middle_result.tolist())
+tmp2 = middle_result.shift(1)
+print((middle_result - tmp2).tolist())
+
+# Solution 2
+print('-'*60)
+print(ser.diff().tolist())
+print(ser.diff().diff().tolist())
 # -
-
-
-
-
-
-
-
-
-
-
-
 
 
 
