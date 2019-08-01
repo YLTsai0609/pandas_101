@@ -1,6 +1,7 @@
 # Pandas 101
 大量的Series, DataFame操作經常讓你手足無措?
 資料處理 - 繁瑣，無趣，卻重要。
+
 鍛煉Pandas最好的方法 : 
 1. You should 看別人的code，增加背景知識。
 2. You Must 自己寫，並考慮更好的寫法。
