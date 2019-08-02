@@ -7,22 +7,22 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.4'
-#       jupytext_version: 1.1.3
+#       jupytext_version: 1.1.6
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
 #     name: python3
 # ---
 
-# * There are alternative solution and hits: 
-# * more readable
-# > 10, 18
-# * more effient (vectorlized)
-# > 16, 19
-# * when to use it?
-# > 13
-# * hints
-# > 12, 18
+# ## There are alternative solution and hits: 
+# ### more readable
+# > 10, 18, 23, 24, 25
+# ### more effient (vectorlized)
+# > 16, 19, 24
+# ### when to use it?
+# > 13, 26
+# ### hints
+# > 12, 18, 22, 24
 
 import pandas as pd
 
@@ -107,6 +107,7 @@ np.random.RandomState(100)
 ser = pd.Series(np.random.randint(1, 5, [12]))
 
 # ALTERNATIVE ANSWER
+# More Readable
 top_2_frequent = ser.value_counts().nlargest(2).index
 ser.where(ser.isin(top_2_frequent), other='Other')
 # -
@@ -212,18 +213,113 @@ print((middle_result - tmp2).tolist())
 print('-'*60)
 print(ser.diff().tolist())
 print(ser.diff().diff().tolist())
+# + {}
+# 21. How to convert a series of date-strings to a timeseries?
+# Difficiulty Level: L2
+
+ser = pd.Series(['01 Jan 2010', '02-02-2011', '20120303', '2013/04/04', '2014-05-05', '2015-06-06T12:20'])
+
+pd.to_datetime(ser, infer_datetime_format=True)
+
+# +
+# 22. How to get the day of month, week number, day of year and day of week from a series of date strings?
+# Difficiulty Level: L2
+
+ser = pd.Series(['01 Jan 2010', '02-02-2011', '20120303', '2013/04/04', '2014-05-05', '2015-06-06T12:20'])
+
+tmp = pd.to_datetime(ser)
+# hint
+# use dir(tmp.dt) to check it out what could be called
+# tmp.dt is pandas.core.indexes.accessors.DatetimeProperties object
+# use dir(tmp[0]) to check it out what could be called 
+# tmp[0] is a single element, <class 'pandas._libs.tslibs.timestamps.Timestamp'>
+# you might wanna to check
+# https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html
+# for Timestamp documentation
+# https://dateutil.readthedocs.io/en/stable/index.html
+# dateutil, really good when we want to dealing with time
+
+
+Date = tmp.dt.day.tolist()
+Week_number = tmp.dt.weekofyear.tolist()
+Day_num_of_year = tmp.dt.dayofyear.tolist()
+Dayofweek = tmp.dt.weekday_name.tolist()
+
+print(f''' 
+Date : {Date}
+Week number : {Week_number}
+Day num of year : {Day_num_of_year}
+Day of week : {Dayofweek}
+''')
+
+
+# +
+# 23. How to convert year-month string to dates corresponding to the 4th day of the month?
+# Difficiulty Level: L2
+ser = pd.Series(['Jan 2010', 'Feb 2011', 'Mar 2012'])
+
+# ALTERNATIVE SOLUTION
+# more readable
+pd.to_datetime(ser, infer_datetime_format=True)
+
+# +
+# 24. How to filter words that contain atleast 2 vowels from a series?
+# Difficiulty Level: L3
+
+ser = pd.Series(['Apple', 'Orange', 'Plan', 'Python', 'Money'])
+
+# ALTERNATIVE SOLUTION
+# more readable
+# vectorlized
+condition = ser.str.count('[aeiouAEIOU]') >= 2
+ser[condition]
+# Hint, you cloud use print(dir(ser.str)) to check it out what could be called
+
 # -
 
+# * hint
+#     * <img src = "./RegExp_snap.png"></img>
+#     * pandas中的Series.str方法是向量化的，且通常都支援正則表達式(RegExp)
+#     * 正則表達式可以幫助我們處理很多文字問題
+#     * 像圖中的[aeiou]搭配[AEIUO] --> [aeiuoAEIUO]就解決了此題
+#     * 或許你會想看看這份在[菜鳥上的教學](http://www.runoob.com/python/python-reg-expressions.html)
 
 
+# +
+# 25. How to filter valid emails from a series?
+# Difficiulty Level: L3
 
+# Extract the valid emails from the series emails. The regex pattern for valid emails is provided as reference.
 
+emails = pd.Series(['buying books at amazom.com', 'rameses@egypt.com', 'matt@t.co', 'narendra@modi.com'])
+pattern ='[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}'
 
+# More readable
+condition = emails.str.contains(pattern)
+emails[condition].tolist()
 
+# +
+# 26. How to get the mean of a series grouped by another series?
+# Difficiulty Level: L2
+fruit = pd.Series(np.random.choice(['apple', 'banana', 'carrot'], 10))
+weights = pd.Series(np.linspace(1, 10, 10))
+print(weights.tolist())
+print(fruit.tolist())
 
+print()
+print(weights.groupby(fruit).mean())
 
+# ALTERNATIVE SULOTION
+tmp = pd.DataFrame({'fruit':fruit, 
+              'weights':weights}).groupby('fruit').mean()
 
+tmp['weights'].index.name = ''
+print(tmp['weights'])
 
-
+# When to use?
+# 操作dataframe時我們通常都直接在dataframe裡面groupby, 這題告訴我們
+# series 可以 groupby 另一條series, 之間用index作為對應, 
+# 這讓feature engineering時能夠有更好的彈性
+# -
 
 
