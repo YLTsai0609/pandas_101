@@ -4,6 +4,7 @@
 資料處理 - 繁瑣，無趣，卻重要。
 
 鍛煉Pandas最好的方法 : 
+
 You should...... -> 看別人的code，增加背景知識。
 
 You Must...... -> 自己寫，並考慮更好的寫法。從[Pandas 101](https://www.machinelearningplus.com/python/101-pandas-exercises-python/)鍛鍊出一個更好的自己
