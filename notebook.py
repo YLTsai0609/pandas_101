@@ -16,13 +16,13 @@
 
 # ## There are alternative solution and hits: 
 # ### more readable
-# > 10, 18, 23, 24, 25
+# > 10, 18, 23, 24, 25, 28
 # ### more effient (vectorlized)
 # > 16, 19, 24
 # ### when to use it?
 # > 13, 26
 # ### hints
-# > 12, 18, 22, 24
+# > 12, 18, 22, 24, 28, 29, 30
 
 import pandas as pd
 
