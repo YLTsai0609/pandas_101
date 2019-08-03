@@ -320,6 +320,70 @@ print(tmp['weights'])
 # 操作dataframe時我們通常都直接在dataframe裡面groupby, 這題告訴我們
 # series 可以 groupby 另一條series, 之間用index作為對應, 
 # 這讓feature engineering時能夠有更好的彈性
+# + {}
+# 27. How to compute the euclidean distance between two series?
+# Difficiulty Level: L2
+
+p = pd.Series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+q = pd.Series([10, 9, 8, 7, 6, 5, 4, 3, 2, 1])
+
+sum((p - q) ** 2) ** 0.5
+
+
+# +
+# 28. How to find all the local maxima (or peaks) in a numeric series?
+# Difficiulty Level: L3
+
+# Get the positions of peaks (values surrounded by smaller values on both sides) in ser.
+
+ser = pd.Series([2, 10, 3, 4, 9, 10, 2, 7, 3])
+
+# more readable
+peak_locs = np.argwhere(np.sign(ser.diff(1)) +\
+                        np.sign(ser.diff(-1)) == 2).reshape(-1) 
+
+# hint
+# use diff(-1) to get the backforwd diff
+# you could use this when using diff, shift function
+# diff
+peak_locs
+
+# +
+# 29. How to replace missing spaces in a string with the least frequent character?
+# Replace the spaces in my_str with the least frequent character.
+
+# Difficiulty Level: L2
+
+# hint 
+# a way to concant all series strnig 
+ser = pd.Series(list('dbc deb abed gade'))
+freq = ser.value_counts()
+print(freq)
+least_freq = freq.dropna().index[-1]
+result = "".join(ser.replace(' ', least_freq))
+print(result)
+
+# ALTERNATIVE SOLUTION
+my_str = 'dbc deb abed gade'
+
+least_freq_character = pd.Series(list(my_str)).value_counts().index[-1]
+
+my_str.replace(' ', least_freq_character)
+
+
+# +
+# 30. How to create a TimeSeries starting ‘2000-01-01’ and 10 weekends (saturdays) after that having random numbers as values?
+# Difficiulty Level: L2
+dateime_idx = pd.date_range('2000-01-01', periods=10, freq='W-SAT')
+
+pd.Series(index = dateime_idx,
+          data = np.random.randint(2,8,size=len(dateime_idx)))
+# hint 
+# it is really hard to find the pd.date_range method in documentation
+# here is the documentation
+# https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.date_range.html
+
+
 # -
 
 
