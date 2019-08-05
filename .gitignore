@@ -1,6 +1,7 @@
 # ipynb_checkpoints, vscode
 .ipynb_checkpoints
-
 .vscode
+.DS_Store
+__pyche__/
 
 
