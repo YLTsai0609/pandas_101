@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.4'
-#       jupytext_version: 1.1.6
+#       jupytext_version: 1.1.3
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -22,7 +22,7 @@
 # ### when to use it?
 # > 13, 26
 # ### hints
-# > 12, 18, 22, 24, 28, 29, 30
+# > 12, 18, 22, 24, 28, 29, 30, 33
 
 import pandas as pd
 
@@ -382,6 +382,50 @@ pd.Series(index = dateime_idx,
 # it is really hard to find the pd.date_range method in documentation
 # here is the documentation
 # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.date_range.html
+
+
+# +
+# 31. How to fill an intermittent time series so all missing dates show up with values of previous non-missing date?
+# Difficiulty Level: L2
+
+ser = pd.Series([1,10,3,np.nan], index=pd.to_datetime(['2000-01-01', '2000-01-03', '2000-01-06', '2000-01-08']))
+
+# Fill the datetime index using resample + ffill()
+ser.resample('D').ffill()
+
+
+# +
+# 32. How to compute the autocorrelations of a numeric series?
+# Difficiulty Level: L3
+
+# Compute autocorrelations for the first 10 lags of ser. Find out which lag has the largest correlation.
+
+ser = pd.Series(np.arange(20) + np.random.normal(1, 10, 20))
+
+# ALTERNATIVE　SOLUTION
+tmp = pd.Series([abs(ser.autocorr(lag)) for lag in range(1,11)])
+tmp.sort_values(ascending=False).head(1)
+
+# +
+# 33. How to import only every nth row from a csv file to create a dataframe?
+# Difficiulty Level: L2
+
+# Import every 50th row of BostonHousing dataset as a dataframe.
+url = 'https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv'
+
+# df_result = pd.DataFrame()
+
+df = pd.read_csv(url, chunksize=50)
+
+df_result = pd.concat([chunk.iloc[0] for chunk in df], axis=1)
+
+df_result.T
+# Hint
+# pd.read_csv(**param, chunksize=50)
+# will return a TextFileReader 
+# you can use that for looping
+# you could see using
+# print(type(df))
 
 
 # -
