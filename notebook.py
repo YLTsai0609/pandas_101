@@ -16,11 +16,11 @@
 
 # ## There are alternative solution and hits: 
 # ### more readable
-# > 10, 18, 23, 24, 25, 28
+# > 10, 18, 23, 24, 25, 28, 37, 38
 # ### more effient (vectorlized)
 # > 16, 19, 24
 # ### when to use it?
-# > 13, 26
+# > 13, 26, 36
 # ### hints
 # > 12, 18, 22, 24, 28, 29, 30, 33
 
@@ -428,6 +428,74 @@ df_result.T
 # print(type(df))
 
 
+# +
+# 34. How to change column values when importing csv to a dataframe?
+# Difficulty Level: L2
+
+# Import the boston housing dataset, but while importing change the 'medv' (median house value) column so that values < 25 becomes ‘Low’ and > 25 becomes ‘High’.
+
+url = 'https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv'
+converters = {'medv': lambda x :'High' if float(x) > 25
+                                       else 'Low'}
+df = pd.read_csv(url, converters=converters)
+df.head()
+
+
+
+# +
+# 35. How to create a dataframe with rows as strides from a given series?
+# Difficiulty Level: L3
+
+L = pd.Series(range(15))
+
+def gen_strides(a, stride_len=5, window_len=5):
+    n_strides = ((a.size-window_len)//stride_len) + 1
+    return np.array([a[s:(s+window_len)] for s in np.arange(0, a.size, stride_len)[:n_strides]])
+
+gen_strides(L, stride_len=2, window_len=4)
+
+# +
+# 36. How to import only specified columns from a csv file?
+# Difficulty Level: L1
+
+url = 'https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv'
+cols = ['crim','medv']
+pd.read_csv(url, usecols=cols).head()
+
+# When to use
+# 資料量大時，硬體記憶體不足，只讀取幾個column做特徵工程
+# 並存取特徵結果
+
+# +
+# 37. How to get the nrows, ncolumns, datatype, summary stats of each column of a dataframe? Also get the array and list equivalent.
+# Difficulty Level: L2
+url = 'https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv'
+df = pd.read_csv(url)
+
+# More readable
+display(
+df.shape,
+df.dtypes,
+df.describe()
+)
+# get np.array and list
+array = df.values
+df_list = df.values.tolist()
+
+
+# +
+# 38. How to extract the row and column number of a particular cell with given criterion?
+# Difficulty Level: L1
+
+df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
+
+# More Readable
+highest_price = df['Price'].max()
+# the dataframe rows
+df.query(f'Price == {highest_price}')
+# the row idx and col idx
+row, col = np.argwhere(df.values == np.max(df.Price)).reshape(-1)
+print(row, col)
 # -
 
 
