@@ -16,11 +16,11 @@
 
 # ## There are alternative solution and hits: 
 # ### more readable
-# > 10, 18, 23, 24, 25, 28, 37, 38
+# > 10, 18, 23, 24, 25, 28, 37, 38, 44
 # ### more effient (vectorlized)
-# > 16, 19, 24
+# > 16, 19, 24, 43
 # ### when to use it?
-# > 13, 26, 36
+# > 13, 26, 36, 39, 41
 # ### hints
 # > 12, 18, 22, 24, 28, 29, 30, 33
 
@@ -496,6 +496,125 @@ df.query(f'Price == {highest_price}')
 # the row idx and col idx
 row, col = np.argwhere(df.values == np.max(df.Price)).reshape(-1)
 print(row, col)
+# + {}
+# 39. How to rename a specific columns in a dataframe?
+# Difficulty Level: L2
+
+# Rename the column Type as CarType in df and replace the ‘.’ in column names with ‘_’.
+df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
+
+tmp = [col.replace('.','_') for col in df.columns]
+df.columns = tmp
+df = df.rename(columns={'Type':'CarType'})
+df.columns
+
+# When to use
+# 第一次拿到資料時，針對特徵欄位做資料清理
+# 甚至會加註categorical feature CAT_FeatureName
+# Numerical feature Num_FeatureName......等
+
+
+# +
+# 40. How to check if a dataframe has any missing values?
+# Difficulty Level: L1
+df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
+
+df.isnull().any().any()
+
+# +
+# 41. How to count the number of missing values in each column?
+# Difficulty Level: L2
+df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
+
+nan_p_series = df.isnull().sum() / len(df)
+nan_p_series.sort_values(ascending=False).head(1)
+
+# when to use
+# 缺失值統計，近乎每次必用
+
+# +
+# 42. How to replace missing values of multiple numeric columns with the mean?
+# Difficulty Level: L2
+
+df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
+
+for col in ['Min.Price','Max.Price']:
+    respective_mean = df[col].mean()
+    df[col] = df[col].fillna(respective_mean)
+
+df[['Min.Price','Max.Price']].isnull().any().any()
+
+# +
+# 43. How to use apply function on existing columns with global variables as additional arguments?
+# Difficulty Level: L3
+
+# In df, use apply method to replace the missing values in Min.Price with the column’s mean and those in Max.Price with the column’s median.
+
+df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
+
+d = {'Min.Price': np.nanmean, 'Max.Price': np.nanmedian}
+df[['Min.Price', 'Max.Price']] = df[['Min.Price', 'Max.Price']]\
+.apply(lambda x, d: x.fillna(d[x.name](x)), args=(d, ))
+
+# Vectorlized 
+# 使用 42題的方式，改成median填入，是向量化操作
+# 在資料量大時會快非常多
+
+# +
+# 44. How to select a specific column from a dataframe as a dataframe instead of a series?
+# Difficulty Level: L2
+
+df = pd.DataFrame(np.arange(20).reshape(-1, 5), columns=list('abcde'))
+
+# More readable
+
+df[['a']]
+
+# +
+# 45. How to change the order of columns of a dataframe?
+# Difficulty Level: L3
+# Actually 3 questions.
+
+# In df, interchange columns 'a' and 'c'.
+# Create a generic function to interchange two columns, without hardcoding column names.
+
+# Sort the columns in reverse alphabetical order, that is colume 'e' first through column 'a' last.
+
+df = pd.DataFrame(np.arange(20).reshape(-1, 5), columns=list('abcde'))
+
+# 1
+df[list('cbade')]
+
+# 2 
+# no function to do that
+def swap_col(df, col1, col2):
+    df_swap = df.copy()
+    col_list = list(df_swap.columns)
+    col1_idx = col_list.index(col1)
+    col2_idx = col_list.index(col2)
+    col_list[col1_idx] = col2
+    col_list[col2_idx] = col1
+    
+    return df_swap[col_list]
+
+swap_col(df, 'c','e')
+
+# 3
+new_order = sorted(list(df.columns), reverse=True)
+df[new_order]
+
+# +
+# 46. How to set the number of rows and columns displayed in the output?
+# Difficulty Level: L2
+
+# Change the pamdas display settings on printing the dataframe df it shows a maximum of 10 rows and 10 columns.
+
+df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
+# show all options
+# pd.describe_option()
+pd.set_option('display.max_columns', 10) 
+pd.set_option('display.max_rows', 10) 
+df
 # -
 
 
