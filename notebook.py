@@ -616,5 +616,100 @@ pd.set_option('display.max_columns', 10)
 pd.set_option('display.max_rows', 10) 
 df
 # -
+pd.describe_option()
+
+# +
+# 47. How to format or suppress scientific notations in a pandas dataframe?
+# Difficulty Level: L2
+
+# Suppress scientific notations like ‘e-03’ in df and print upto 4 numbers after decimal.
+df = pd.DataFrame(np.random.random(4)**10, columns=['random'])
+
+
+pd.options.display.float_format = '{:,.4f}'.format
+
+display(df)
+
+# undo
+pd.options.display.float_format = None
+
+
+# +
+# 48. How to format all the values in a dataframe as percentages?
+# Difficulty Level: L2
+
+# Format the values in column 'random' of df as percentages.
+
+df = pd.DataFrame(np.random.random(4), columns=['random'])
+
+
+df.style.format({'random':'{0:.2%}'.format,})
+
+# +
+# 49. How to filter every nth row in a dataframe?
+# Difficulty Level: L1
+
+# From df, filter the 'Manufacturer', 'Model' and 'Type' for every 20th row starting from 1st (row 0).
+
+df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
+
+# More readable
+
+idx = np.arange(0, df.shape[0], step=20)
+col = ['Manufacturer','Model','Type']
+df[col].iloc[idx]
+
+# +
+# 50. How to create a primary key index by combining relevant columns?
+# Difficulty Level: L2
+
+# In df, Replace NaNs with ‘missing’ in columns 'Manufacturer', 'Model' and 'Type' 
+# and create a index as a combination of these three columns and check if the index is a primary key.
+
+df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv', usecols=[0,1,2,3,5])
+
+col = ['Manufacturer','Model','Type']
+idx_col = '.Price'
+df[col] = df[col].fillna('missing')
+df.index = df.Manufacturer + '_' + df.Model + '_' + df.Type
+display(df.head(),
+       df.index.is_unique)
+# When to use
+# 根據column內容來設置 Primary key的手法非常實用
+# 容易給其他同事進行表格閱讀
+
+# +
+# 51. How to get the row number of the nth largest value in a column?
+# Difficulty Level: L2
+# Find the row position of the 5th largest value of column 'a' in df.
+df = pd.DataFrame(np.random.randint(1, 30, 30).reshape(10,-1), columns=list('abc'))
+
+# More readable
+
+df['a'].nlargest().index[-1]
+
+# +
+# 52. How to find the position of the nth largest value greater than a given value?
+# Difficulty Level: L2
+
+# In ser, find the position of the 2nd largest value greater than the mean.
+
+# More readable
+ser = pd.Series(np.random.randint(1, 100, 15))
+
+tmp = ser - ser.mean()
+
+tmp.nlargest(2).index
+
+# +
+# 53. How to get the last n rows of a dataframe with row RowSum > 100?
+# Difficulty Level: L2
+
+# Get the last two rows of df whose row RowSum is greater than 100.
+df = pd.DataFrame(np.random.randint(10, 40, 60).reshape(-1, 4))
+
+df['RowSum'] = df.sum(axis=1)
+df.query('RowSum > 100').tail(2)
+# -
 
 
