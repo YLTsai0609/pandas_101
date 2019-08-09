@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.4'
-#       jupytext_version: 1.1.3
+#       jupytext_version: 1.1.6
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -16,13 +16,13 @@
 
 # ## There are alternative solution and hits: 
 # ### more readable
-# > 10, 18, 23, 24, 25, 28, 37, 38, 44
+# > 10, 18, 23, 24, 25, 28, 37, 38, 44, 54, 58, 60
 # ### more effient (vectorlized)
 # > 16, 19, 24, 43
 # ### when to use it?
-# > 13, 26, 36, 39, 41
+# > 13, 26, 36, 39, 41, 58, 60,
 # ### hints
-# > 12, 18, 22, 24, 28, 29, 30, 33
+# > 12, 18, 22, 24, 28, 29, 30, 33, 56, 59
 
 import pandas as pd
 
@@ -708,8 +708,156 @@ tmp.nlargest(2).index
 # Get the last two rows of df whose row RowSum is greater than 100.
 df = pd.DataFrame(np.random.randint(10, 40, 60).reshape(-1, 4))
 
+# More readable
 df['RowSum'] = df.sum(axis=1)
 df.query('RowSum > 100').tail(2)
+# + {}
+# 54. How to find and cap outliers from a series or dataframe column?
+# Difficulty Level: L2
+
+# Replace all values of ser in the lower 5%ile and greater than 95%ile with respective 5th and 95th %ile value.
+
+# More readable
+ser = pd.Series(np.logspace(-2, 2, 30))
+low = np.quantile(ser, q=.05)
+high = np.quantile(ser, q=.95)
+ser.clip(low, high)
+
+
+# +
+# 55. How to reshape a dataframe to the largest possible square after removing the negative values?
+
+# Difficulty Level: L3
+
+# Reshape df to the largest possible square with negative values removed.
+# Drop the smallest values if need be. 
+# The order of the positive numbers in the result should remain the same as the original.
+
+df = pd.DataFrame(np.random.randint(-20, 50, 100).reshape(10,-1))
+display(df)
+def larget_square(df):
+    tmp = df.copy()
+    # get positive array
+    arr = tmp[tmp > 0].values
+    arr = arr[~ np.isnan(arr)]
+    # get largest square of side
+    N = np.floor(arr.shape[0] ** 0.5).astype(int)
+    # get index the arr soted
+    top_idx = np.argsort(arr)[::-1]
+    # drop min idx satisfied largest square
+    # then reshape
+    # key point, sort the top_idx, will give us 
+    # the original idx already take out minmimum value
+    filtered_idx = top_idx[: (N ** 2)]
+    result = pd.DataFrame(arr[sorted(filtered_idx)].reshape(N, -1))
+    return result
+
+larget_square(df)
+
+# +
+# 56. How to swap two rows of a dataframe?
+# Difficulty Level: L2
+
+# Swap rows 1 and 2 in df.
+
+df = pd.DataFrame(np.arange(25).reshape(5, -1))
+display(df.head(2))
+row1, row2 = df.iloc[0].copy(), df.iloc[1].copy()
+df.iloc[0], df.iloc[1] = row2, row1
+display(df.head(2))
+
+# Hint
+# use copy, or you're chaining by the original dataframe
+
+# +
+# 57. How to reverse the rows of a dataframe?
+# Difficulty Level: L2
+
+# Reverse all the rows of dataframe df.
+
+df = pd.DataFrame(np.arange(25).reshape(5, -1))
+
+df.iloc[::-1]
+
+# +
+# 58. How to create one-hot encodings of a categorical variable (dummy variables)?
+# Difficulty Level: L2
+
+# Get one-hot encodings for column 'a' in the dataframe df and append it as columns.
+
+df = pd.DataFrame(np.arange(25).reshape(5,-1), columns=list('abcde'))
+
+# More readable
+concat_list = [df.drop(columns=['a']),
+              pd.get_dummies(df['a'])]
+
+result = pd.concat(concat_list, axis=1)
+result
+
+# When to use
+# one hot encoding 非常常用, 其中get_dummy有sparse, drop_first可以選
+# 但testing set 或是 validation set 出現unseen column 需要進行處理
+# 推薦使用 sklearn.preprocessing, unseen col會使training col 全為0
+# https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OneHotEncoder.html
+
+
+# +
+# 59. Which column contains the highest number of row-wise maximum values?
+# Difficulty Level: L2
+
+# Obtain the column name with the highest number of row-wise maximum’s in df.
+
+
+df = pd.DataFrame(np.random.randint(1,100, 40).reshape(10, -1))
+display(df)
+def largest_value_col_row_wise(df):
+    tmp = df.copy()
+    result_col = []
+    for row in range(tmp.shape[0]):
+        max_idx = tmp.iloc[row,:].idxmax()
+        result_col.append(tmp.columns[max_idx])
+    return result_col
+result = largest_value_col_row_wise(df)
+result
+
+# Hint, pd.Series.argmax 要被棄用了 使用idxmax替代
+
+
+# +
+# 60. How to create a new column that contains the row number of nearest column by euclidean distance?
+# Create a new column such that, each row contains the row number of nearest row-record by euclidean distance.
+
+# Difficulty Level: L3
+
+df = pd.DataFrame(np.random.randint(1,100, 40).reshape(10, -1), columns=list('pqrs'), index=list('abcdefghij'))
+display(df.head())
+
+# more readable
+def get_neast_and_euclidean_dist(df):
+    from scipy.spatial.distance import pdist, squareform
+    row_name = df.index.tolist()
+    dist = pdist(df, 'euclidean')
+    df_dist = pd.DataFrame(squareform(dist), columns=row_name, index=row_name)
+    
+    nearest_list = []
+    nearest_dist_list = []
+    # instead of list comprehension
+    # for loop is more readable for complex operation
+    for row in df_dist.index:
+        nearest_info = df_dist.loc[row, :].sort_values()
+        nearest_idx, nearest_dist = nearest_info.index[1], nearest_info.values[1]
+        nearest_list.append(nearest_idx)
+        nearest_dist_list.append(nearest_dist)
+    df_dist['nearset'] = nearest_list
+    df_dist['dist'] = nearest_dist_list
+    
+    return df_dist
+get_neast_and_euclidean_dist(df)
+
+# when to use
+# 計算距離時, pdist, squareform
+# 提供了非常多基於numpy計算的距離，包含euclidean, cosine, correlation,
+# hamming, 等等, 非常實用
 # -
 
 
