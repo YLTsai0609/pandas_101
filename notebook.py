@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.4'
-#       jupytext_version: 1.1.6
+#       jupytext_version: 1.1.3
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -858,6 +858,18 @@ get_neast_and_euclidean_dist(df)
 # 計算距離時, pdist, squareform
 # 提供了非常多基於numpy計算的距離，包含euclidean, cosine, correlation,
 # hamming, 等等, 非常實用
-# -
+# + {}
+# 61. How to know the maximum possible correlation value of each column against other columns?
+# Difficulty Level: L2
 
+# Compute maximum possible absolute correlation value of each column against other columns in df.
+
+df = pd.DataFrame(np.random.randint(1,100, 80).reshape(8, -1), columns=list('pqrstuvwxy'), index=list('abcdefgh'))
+
+corr_df = abs(df.corr())
+max_corr_list = [(feature, 
+                  (corr_df[feature].sort_values(ascending=False).index[1],
+                   corr_df[feature].sort_values(ascending=False)[1]))
+                 for feature in corr_df.columns]
+max_corr_list
 
