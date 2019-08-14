@@ -873,3 +873,93 @@ max_corr_list = [(feature,
                  for feature in corr_df.columns]
 max_corr_list
 
+
+# +
+# 62. How to create a column containing the minimum by maximum of each row?
+# Difficulty Level: L2
+
+# Compute the minimum-by-maximum for every row of df.
+
+df = pd.DataFrame(np.random.randint(1,100, 80).reshape(8, -1))
+
+# Vectorlized
+
+df['RowMinByMax'] = df.min(axis=0) / df.max(axis=0)
+df.head()
+
+# +
+# 63. How to create a column that contains the penultimate value in each row?
+# Difficulty Level: L2
+
+# Create a new column 'penultimate' which has the second largest value of each row of df.
+df = pd.DataFrame(np.random.randint(1,100, 80).reshape(8, -1))
+
+row_penultimate_collection = []
+for row in df.index:
+    row_penultimate = df.loc[row,:].sort_values().iloc[1]
+    row_penultimate_collection.append(row_penultimate)
+df['Row_Penultimate'] = row_penultimate_collection
+df.head()
+
+# +
+# 64. How to normalize all columns in a dataframe?
+# Difficulty Level: L2
+df = pd.DataFrame(np.random.randint(1,100, 80).reshape(8, -1))
+
+# vectorlized
+def Nomolize_df(df, minmax=False):
+    tmp = df.copy()
+    for col in tmp.columns:
+        if not minmax:
+            mean = tmp[col].mean()
+            std = tmp[col].std()
+            tmp[col] = (tmp[col] - mean) / std
+        min_col = tmp[col].min()
+        max_col = tmp[col].max()
+        tmp[col] = (max_col - tmp[col]) / (max_col - min_col)
+    return tmp
+
+df_nor = Nomolize_df(df)
+df_minmax = Nomolize_df(df, minmax=True)
+display(df_nor,
+       df_minmax)
+
+# +
+# 65. How to compute the correlation of each row with the suceeding row?
+# Difficulty Level: L2
+
+# Compute the correlation of each row of df with its succeeding row.
+
+df = pd.DataFrame(np.random.randint(1,100, 80).reshape(8, -1))
+
+corr_list = []
+for first_row_idx, second_row_idx in zip(df.index[:-1],
+                                         df.index[1:]):
+    first_row = df.iloc[first_row_idx,:]
+    second_row = df.iloc[second_row_idx,:]
+
+    corr_list.append(
+        (first_row_idx, second_row_idx, first_row.corr(second_row))
+    )
+corr_list
+
+# +
+# 66. How to replace both the diagonals of dataframe with 0?
+# Difficulty Level: L2
+
+# Replace both values in both diagonals of df with 0.
+
+df = pd.DataFrame(np.random.randint(1,100, 100).reshape(10, -1))
+
+# More readable
+np.fill_diagonal(df.values, 0)
+
+df
+# hint
+# np.fill_diagonal 沒有return值, 
+# 因此 new_array = np.fill_diagonal(df.values, 0), new_array會為None
+# pd.DataFrame.values 只能呼叫，無法直接帶入值
+# 因此 df.vales = np.fill_diagonal(df.values, 0) 不會work
+# -
+
+
