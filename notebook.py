@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.4'
-#       jupytext_version: 1.1.3
+#       jupytext_version: 1.1.6
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -16,13 +16,13 @@
 
 # ## There are alternative solution and hits: 
 # ### more readable
-# > 10, 18, 23, 24, 25, 28, 37, 38, 44, 54, 58, 60
+# > 10, 18, 23, 24, 25, 28, 37, 38, 44, 54, 58, 60, 66
 # ### more effient (vectorlized)
-# > 16, 19, 24, 43
+# > 16, 19, 24, 43, 62
 # ### when to use it?
 # > 13, 26, 36, 39, 41, 58, 60,
 # ### hints
-# > 12, 18, 22, 24, 28, 29, 30, 33, 56, 59
+# > 12, 18, 22, 24, 28, 29, 30, 33, 56, 59, 66
 
 import pandas as pd
 
@@ -960,6 +960,63 @@ df
 # 因此 new_array = np.fill_diagonal(df.values, 0), new_array會為None
 # pd.DataFrame.values 只能呼叫，無法直接帶入值
 # 因此 df.vales = np.fill_diagonal(df.values, 0) 不會work
-# -
+# + {}
+# pandas tricks from Kevin Markham
+# Does your Series contain lists of itrms?
+df = pd.DataFrame({'sandwich':['PB&J','BLT','cheese'],
+             'ingredients':[['peanut butter','jelly'],
+                           ['bacon','lettuce','tomato'],
+                           ['swiss cheese']]},
+            index=['a','b','c'])
 
 
+df.explode('ingredients')
+# Hint new method in 0.25
+# Data Cleaning 時非常有用
+# 尤其是從json格式讀取檔案時
+# 同樣的方法在pd.Series當中也有
+
+
+# +
+# pandas tricks from Kevin Markham
+# Does your Series contain comma-separation items?
+
+df = pd.DataFrame({'sandwich':['PB&J','BLT','cheese'],
+             'ingredients':['peanut butter,jelly',
+                           'bacon,lettuce,tomato',
+                           'swiss cheese']},
+            index=['a','b','c'])
+
+# More readable
+# 使用assign
+df.assign(
+    ingredients = df.ingredients.str.split(',')).\
+    explode('ingredients')
+
+
+# +
+# pandas tricks from Kevin Markham
+# Does your Series contain comma-separation items?
+# And you want to expand them to new columns
+
+df = pd.DataFrame({'sandwich':['PB&J','BLT','cheese'],
+             'ingredients':['peanut butter,jelly',
+                           'bacon,lettuce,tomato',
+                           'swiss cheese']},
+            index=['a','b','c'])
+
+# More readable
+# 使用split, expand
+# 使用add_prefix增加可讀性
+
+df.ingredients.str.split(',', expand=True).\
+add_prefix('ingredients_')
+
+
+# +
+# pandas tricks from Kevin Markham
+# Check your merge dataframe keys
+df1 = pd.util.testing.makeMixedDataFrame()
+df2 = df1.drop([2,3], axis='rows')
+
+pd.merge(df1, df2, how='left',indicator=True) 
