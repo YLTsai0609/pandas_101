@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.4'
-#       jupytext_version: 1.1.6
+#       jupytext_version: 1.1.3
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -20,9 +20,9 @@
 # ### more effient (vectorlized)
 # > 16, 19, 24, 43, 62
 # ### when to use it?
-# > 13, 26, 36, 39, 41, 58, 60,
+# > 13, 26, 36, 39, 41, 58, 60, 67
 # ### hints
-# > 12, 18, 22, 24, 28, 29, 30, 33, 56, 59, 66
+# > 12, 18, 22, 24, 28, 29, 30, 33, 56, 59, 66, 67
 
 import pandas as pd
 
@@ -961,6 +961,76 @@ df
 # pd.DataFrame.values 只能呼叫，無法直接帶入值
 # 因此 df.vales = np.fill_diagonal(df.values, 0) 不會work
 # + {}
+# 67. How to get the particular group of a groupby dataframe by key?
+# Difficulty Level: L2
+
+df = pd.DataFrame({'col1': ['apple', 'banana', 'orange'] * 3,
+                   'col2': np.random.rand(9),
+                   'col3': np.random.randint(0, 15, 9)})
+
+df_grouped = df.groupby(['col1'])
+
+
+df_grouped.get_group('apple')
+
+# hint 使用 # print(dir(df_grouped)) 來呼叫groupby物件的所有屬性及方法
+# hint 使用 以下 來呼叫groupby中所有非隱藏方法
+# print([method for method in dir(df_grouped)
+#                          if not method.startswith('_')])
+# when to use
+# 對於groupby的操作，在資料處理時使用頻率非常高，有了上面的hint
+# 我們可以更有依據的查詢怎麼都出我們要的結果
+# 會節省非常多時間在特徵工程上
+
+# +
+# 68. How to get the n’th largest value of a column when grouped by another column?
+# Difficulty Level: L2
+df = pd.DataFrame({'fruit': ['apple', 'banana', 'orange'] * 3,
+                   'rating': np.random.rand(9),
+                   'price': np.random.randint(0, 15, 9)})
+
+df_apple = df.groupby(['fruit']).get_group('apple')
+df_apple.sort_values(by='rating', ascending=False).iloc[1]
+
+
+
+# +
+# 69. How to compute grouped mean on pandas dataframe and keep the grouped column as another column (not index)?
+# Difficulty Level: L1
+
+# In df, Compute the mean price of every fruit, while keeping the fruit as another column instead of an index.
+
+df = pd.DataFrame({'fruit': ['apple', 'banana', 'orange'] * 3,
+                   'rating': np.random.rand(9),
+                   'price': np.random.randint(0, 15, 9)})
+
+df.groupby('fruit', as_index=False).mean()
+
+# +
+# 70. How to join two dataframes by 2 columns so they have only the common rows?
+# Difficulty Level: L2
+
+# Join dataframes df1 and df2 by ‘fruit-pazham’ and ‘weight-kilo’.
+
+
+df1 = pd.DataFrame({'fruit': ['apple', 'banana', 'orange'] * 3,
+                    'weight': ['high', 'medium', 'low'] * 3,
+                    'price': np.random.randint(0, 15, 9)})
+
+df2 = pd.DataFrame({'pazham': ['apple', 'orange', 'pine'] * 2,
+                    'kilo': ['high', 'low'] * 3,
+                    'price': np.random.randint(0, 15, 6)})
+
+pd.merge(df1, df2, left_on = ['fruit','weight'],
+                    right_on = ['pazham','kilo'],
+                    how = 'inner')
+# -
+
+
+
+
+
+# +
 # pandas tricks from Kevin Markham
 # Does your Series contain lists of itrms?
 df = pd.DataFrame({'sandwich':['PB&J','BLT','cheese'],
