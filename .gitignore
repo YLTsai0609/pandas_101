@@ -2,6 +2,6 @@
 .ipynb_checkpoints
 .vscode
 .DS_Store
-__pyche__/
+__pycache__/
 
 
