@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.4'
-#       jupytext_version: 1.1.3
+#       jupytext_version: 1.1.6
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -23,6 +23,8 @@
 # > 13, 26, 36, 39, 41, 58, 60, 67
 # ### hints
 # > 12, 18, 22, 24, 28, 29, 30, 33, 56, 59, 66, 67, 72
+
+# # Pandas 101
 
 import pandas as pd
 
@@ -1090,7 +1092,79 @@ new_header = df_out.iloc[0]
 df_out = df_out[1:]
 df_out.columns = new_header
 df_out
-# + {}
+# -
+# # Some function you should know...
+
+# +
+# pd.DataFrame.melt
+# Person 1, 2, 3 週一至週日的某數值
+# make the dataframe display with -> columns:['weekday','PersonNo','Score']
+data = {'weekday': ["Monday", "Tuesday", "Wednesday", 
+         "Thursday", "Friday", "Saturday", "Sunday"],
+        'Person 1': [12, 6, 5, 8, 11, 6, 4],
+        'Person 2': [10, 6, 11, 5, 8, 9, 12],
+        'Person 3': [8, 5, 7, 3, 7, 11, 15]}
+df = pd.DataFrame(data, columns=['weekday',
+        'Person 1', 'Person 2', 'Person 3'])
+
+df_result = df.melt(id_vars=['weekday'],
+                    value_vars=['Person 1','Person 2','Person 3'],
+                    var_name='PersonNo',value_name='Score'
+                    )
+df_result.head()
+
+# when to use
+# 畫圖時經常會需要先melt, 當需要的欄位不在dataframe的值中而是在columns上或是index上時(pivot-table)
+# 從 pivot-table 轉回tidy datframe (unpivot)
+
+# ref
+# https://deparkes.co.uk/2016/10/28/reshape-pandas-data-with-melt/
+
+# +
+# pd.DataFrame.melt
+# 再一個例子
+# make dataframe display like columns:['location','name','Date','Score']
+data = {'location':['A','B'],
+       'name':['test','foo'],
+       'Jan-2010':[12,18],
+       'Feb-2010':[20,20],
+       'March-2010':[30,25]}
+df = pd.DataFrame(data=data, columns=data.keys())
+
+df.melt(id_vars=['location','name'],
+       var_name='Date',
+       value_name='Score')
+
+
+# +
+# unstack
+# 處理multi-index
+# make the MiltiIndex series display as tidy dataframe like : columns:['number','class','value']
+index = pd.MultiIndex.from_tuples([('one', 'a'), ('one', 'b'),
+                                    ('two', 'a'), ('two', 'b')])
+s = pd.Series(np.arange(1.0, 5.0), index=index)
+
+def get_tidy_df(s):
+    tmp = s.unstack().reset_index().rename(columns={'index':'number'})
+    tmp = tmp.melt(id_vars=['number'],
+                   var_name=['class'],
+                   value_name='value')
+    return tmp
+
+get_tidy_df(s)
+# -
+
+
+
+
+
+
+
+
+
+# # pandas tricks from Kevin Markham
+
+# +
 # pandas tricks from Kevin Markham
 # Does your Series contain lists of itrms?
 df = pd.DataFrame({'sandwich':['PB&J','BLT','cheese'],
