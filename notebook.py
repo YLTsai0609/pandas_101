@@ -16,13 +16,13 @@
 
 # ## There are alternative solution and hits: 
 # ### more readable
-# > 10, 18, 23, 24, 25, 28, 37, 38, 44, 54, 58, 60, 66
+# > 10, 18, 23, 24, 25, 28, 37, 38, 44, 54, 58, 60, 66, 71
 # ### more effient (vectorlized)
 # > 16, 19, 24, 43, 62
 # ### when to use it?
 # > 13, 26, 36, 39, 41, 58, 60, 67
 # ### hints
-# > 12, 18, 22, 24, 28, 29, 30, 33, 56, 59, 66, 67
+# > 12, 18, 22, 24, 28, 29, 30, 33, 56, 59, 66, 67, 72
 
 import pandas as pd
 
@@ -1024,13 +1024,73 @@ df2 = pd.DataFrame({'pazham': ['apple', 'orange', 'pine'] * 2,
 pd.merge(df1, df2, left_on = ['fruit','weight'],
                     right_on = ['pazham','kilo'],
                     how = 'inner')
-# -
+# + {}
+# 71. How to remove rows from a dataframe that are present in another dataframe?
+# Difficulty Level: L3
+
+# From df1, remove the rows that are present in df2. All three columns must be the same.
+df1 = pd.DataFrame({'fruit': ['apple', 'orange', 'banana'] * 3,
+                    'weight': ['high', 'medium', 'low'] * 3,
+                    'price': np.arange(9)})
+
+df2 = pd.DataFrame({'fruit': ['apple', 'orange', 'pine'] * 2,
+                    'weight': ['high', 'medium'] * 3,
+                    'price': np.arange(6)})
+display(df1,
+       df2)
+# More readable result
+mask = ~ df1.isin(df2).all(axis='columns')
+df1[mask]
+# + {}
+# 72. How to get the positions where values of two columns match?
+# Difficulty Level: L2
+df = pd.DataFrame({'fruit1': np.random.choice(['apple', 'orange', 'banana'], 10),
+                    'fruit2': np.random.choice(['apple', 'orange', 'banana'], 10)})
 
 
+np.where(df.fruit1 == df.fruit2)
 
-
+# Hint
+# 條件篩選 - np.where
 
 # +
+# 73. How to create lags and leads of a column in a dataframe?
+
+df = pd.DataFrame(np.random.randint(1, 100, 20).reshape(-1, 4), columns = list('abcd'))
+
+df = df.assign(aLag1 = df.a.shift(1),
+               bLead1 = df.b.shift(-1))
+df
+
+# +
+# 74. How to get the frequency of unique values in the entire dataframe?
+# Difficulty Level: L2
+
+# Get the frequency of unique values in the entire dataframe df.
+df = pd.DataFrame(np.random.randint(1, 10, 20).reshape(-1, 4), columns = list('abcd'))
+
+np.unique(df.values.reshape(1,-1), return_counts=True)
+
+# +
+# 75. How to split a text column into two separate columns?
+# Difficulty Level: L2
+
+# Split the string column in df to form a dataframe with 3 columns as shown.
+df = pd.DataFrame(["STD, City    State",
+"33, Kolkata    West Bengal",
+"44, Chennai    Tamil Nadu",
+"40, Hyderabad    Telengana",
+"80, Bangalore    Karnataka"], columns=['row'])
+# display(df)
+
+df_out = df.row.str.split(',|\t', expand=True)
+
+# Make first row as header
+new_header = df_out.iloc[0]
+df_out = df_out[1:]
+df_out.columns = new_header
+df_out
+# + {}
 # pandas tricks from Kevin Markham
 # Does your Series contain lists of itrms?
 df = pd.DataFrame({'sandwich':['PB&J','BLT','cheese'],
