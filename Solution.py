@@ -27,6 +27,7 @@
 # # Pandas 101
 
 import pandas as pd
+from IPython.core.display import display
 
 # 1. How to import pandas and check the version? 
 print(pd.__version__)
@@ -108,39 +109,45 @@ ser.value_counts()
 np.random.RandomState(100)
 ser = pd.Series(np.random.randint(1, 5, [12]))
 
-# ALTERNATIVE ANSWER
 # More Readable
 top_2_frequent = ser.value_counts().nlargest(2).index
 ser.where(ser.isin(top_2_frequent), other='Other')
-# -
 
+# +
 #  11. How to bin a numeric series to 10 groups of equal size?
 #  L2
 ser = pd.Series(np.random.random(20))
-# Note ourput dtype is category
+
 pd.qcut(ser,
         q = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1],
         labels=['1st', '2nd','3rd','4th','5th',
                  '6th', '7th', '8th','9th', '10th'])
+
+# hint 
+# 使用qcut輸出的series, dtype為categorical, 各個value之間可以進行比較
 
 # +
 # 12. How to convert a numpy array to a dataframe of given shape? (L1)
 # L1
 ser = pd.Series(np.random.randint(1, 10, 35))
 
-# note : argument -1 will caculate the rest 
-# in this case (7, -1) -->  (7 , 35 / 7)
+
 pd.DataFrame(ser.values.reshape(7,-1))
+# hint
+# 參數 -1 --> 處理好剩下的dimension，在此例中，(7,-1) --> (7, 35/7)
 
 # +
 # 13. How to find the positions of numbers that are multiples of 3 from a series?
 # L2
 ser = pd.Series(np.random.randint(1, 10, 7))
 
-# note : np.where, pd.where return whole series
-#        np.argwhere return index
-#        use the indrx :  arr = np.argwhere(ser condition), ser.iloc(arr.reshape(-1))
+
+
 np.argwhere(ser % 3 == 0)
+
+# hint
+# np.where, pd.where 傳回整個series
+# np.argwhere 傳回index
 
 # +
 # 14. How to extract items at given positions from a series
@@ -165,10 +172,10 @@ df2 = pd.concat([ser1,ser2], axis=1)
 ser1 = pd.Series([10, 9, 6, 5, 3, 1, 12, 8, 13])
 ser2 = pd.Series([1, 3, 10, 13])
 
-# note : this solution is vectorlized
-# faster than list comprehemsion for i in ser2 
-# when data is big
+# vectorlized
 np.argwhere(ser1.isin(ser2)).reshape(-1).tolist()
+
+# np.where進行項量化的操作, 在資料量大時可以保證一定的速度
 # + {}
 # 17. How to compute the mean squared error on a truth and predicted series?
 # Difficulty Level: L2
@@ -186,8 +193,8 @@ ser = pd.Series(['how', 'to', 'kick', 'ass?'])
 # More readable
 ser.str.capitalize()
 # Hints
-# you can use dir() to get all the method inside ser.str
-# Now you could faster understand how ser.str can do
+# 使用dir來得到所有 ser.str中的屬性及方法
+# 如此一來可以更全面的了解有什麼屬性及方法可以call
 # print(dir(ser.str))
 
 # +
@@ -230,16 +237,17 @@ pd.to_datetime(ser, infer_datetime_format=True)
 ser = pd.Series(['01 Jan 2010', '02-02-2011', '20120303', '2013/04/04', '2014-05-05', '2015-06-06T12:20'])
 
 tmp = pd.to_datetime(ser)
+
 # hint
-# use dir(tmp.dt) to check it out what could be called
-# tmp.dt is pandas.core.indexes.accessors.DatetimeProperties object
-# use dir(tmp[0]) to check it out what could be called 
-# tmp[0] is a single element, <class 'pandas._libs.tslibs.timestamps.Timestamp'>
-# you might wanna to check
+# 使用 dir(tmp.dt) 來確認有什麼屬性/方法可以call
+# tmp.dt為pandas.core.indexes.accessors.DatetimeProperties 物件
+# 使用dir(tmp[0])  來確認有什麼屬性/方法可以call
+# tmp[0]為<class 'pandas._libs.tslibs.timestamps.Timestamp'> 物件
+#  pandas timestamp文件
 # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html
-# for Timestamp documentation
+#  dateutil 文件，處理時間資料時非常常用
 # https://dateutil.readthedocs.io/en/stable/index.html
-# dateutil, really good when we want to dealing with time
+
 
 
 Date = tmp.dt.day.tolist()
@@ -260,7 +268,6 @@ Day of week : {Dayofweek}
 # Difficiulty Level: L2
 ser = pd.Series(['Jan 2010', 'Feb 2011', 'Mar 2012'])
 
-# ALTERNATIVE SOLUTION
 # more readable
 pd.to_datetime(ser, infer_datetime_format=True)
 
@@ -270,17 +277,17 @@ pd.to_datetime(ser, infer_datetime_format=True)
 
 ser = pd.Series(['Apple', 'Orange', 'Plan', 'Python', 'Money'])
 
-# ALTERNATIVE SOLUTION
+
 # more readable
 # vectorlized
 condition = ser.str.count('[aeiouAEIOU]') >= 2
 ser[condition]
-# Hint, you cloud use print(dir(ser.str)) to check it out what could be called
+
 
 # -
 
 # * hint
-#     * <img src = "./RegExp_snap.png"></img>
+#     * <img src = "./images/RegExp_snap.png"></img>
 #     * pandas中的Series.str方法是向量化的，且通常都支援正則表達式(RegExp)
 #     * 正則表達式可以幫助我們處理很多文字問題
 #     * 像圖中的[aeiou]搭配[AEIUO] --> [aeiuoAEIUO]就解決了此題
@@ -345,9 +352,8 @@ peak_locs = np.argwhere(np.sign(ser.diff(1)) +\
                         np.sign(ser.diff(-1)) == 2).reshape(-1) 
 
 # hint
-# use diff(-1) to get the backforwd diff
-# you could use this when using diff, shift function
-# diff
+# 使用diff(-1)，來取得backward
+# 同樣性質的方法還有pd.Series.shift
 peak_locs
 
 # +
@@ -357,7 +363,8 @@ peak_locs
 # Difficiulty Level: L2
 
 # hint 
-# a way to concant all series strnig 
+# 此例示範了如何將所有series中的string coacat在一起
+
 ser = pd.Series(list('dbc deb abed gade'))
 freq = ser.value_counts()
 print(freq)
@@ -381,8 +388,7 @@ dateime_idx = pd.date_range('2000-01-01', periods=10, freq='W-SAT')
 pd.Series(index = dateime_idx,
           data = np.random.randint(2,8,size=len(dateime_idx)))
 # hint 
-# it is really hard to find the pd.date_range method in documentation
-# here is the documentation
+# 要在pandas中找到pd.date_range這個方法實在很難找......
 # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.date_range.html
 
 
@@ -415,7 +421,7 @@ tmp.sort_values(ascending=False).head(1)
 # Import every 50th row of BostonHousing dataset as a dataframe.
 url = 'https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv'
 
-# df_result = pd.DataFrame()
+
 
 df = pd.read_csv(url, chunksize=50)
 
@@ -424,9 +430,8 @@ df_result = pd.concat([chunk.iloc[0] for chunk in df], axis=1)
 df_result.T
 # Hint
 # pd.read_csv(**param, chunksize=50)
-# will return a TextFileReader 
-# you can use that for looping
-# you could see using
+# 會return TextFileReader物件, 是可遞迴物件
+# 可以經由以下確認
 # print(type(df))
 
 
@@ -612,7 +617,7 @@ df[new_order]
 # Change the pamdas display settings on printing the dataframe df it shows a maximum of 10 rows and 10 columns.
 
 df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
-# show all options
+# 找到所有可用的set_option
 # pd.describe_option()
 pd.set_option('display.max_columns', 10) 
 pd.set_option('display.max_rows', 10) 
@@ -769,7 +774,7 @@ df.iloc[0], df.iloc[1] = row2, row1
 display(df.head(2))
 
 # Hint
-# use copy, or you're chaining by the original dataframe
+# 使用copy, 否則你的row1, row2和原本的dataframe是連動的
 
 # +
 # 57. How to reverse the rows of a dataframe?
@@ -869,6 +874,7 @@ get_neast_and_euclidean_dist(df)
 df = pd.DataFrame(np.random.randint(1,100, 80).reshape(8, -1), columns=list('pqrstuvwxy'), index=list('abcdefgh'))
 
 corr_df = abs(df.corr())
+
 max_corr_list = [(feature, 
                   (corr_df[feature].sort_values(ascending=False).index[1],
                    corr_df[feature].sort_values(ascending=False)[1]))
