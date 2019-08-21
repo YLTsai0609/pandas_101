@@ -1102,6 +1102,7 @@ df_out
 # # Some function you should know...
 
 # +
+1.
 # pd.DataFrame.melt
 # Person 1, 2, 3 週一至週日的某數值
 # make the dataframe display with -> columns:['weekday','PersonNo','Score']
@@ -1127,6 +1128,7 @@ df_result.head()
 # https://deparkes.co.uk/2016/10/28/reshape-pandas-data-with-melt/
 
 # +
+2.
 # pd.DataFrame.melt
 # 再一個例子
 # make dataframe display like columns:['location','name','Date','Score']
@@ -1143,6 +1145,7 @@ df.melt(id_vars=['location','name'],
 
 
 # +
+# 3.
 # unstack
 # 處理multi-index
 # make the MiltiIndex series display as tidy dataframe like : columns:['number','class','value']
@@ -1173,6 +1176,7 @@ get_tidy_df(s)
 # +
 # pandas tricks from Kevin Markham
 # Does your Series contain lists of itrms?
+# 1
 df = pd.DataFrame({'sandwich':['PB&J','BLT','cheese'],
              'ingredients':[['peanut butter','jelly'],
                            ['bacon','lettuce','tomato'],
@@ -1190,7 +1194,7 @@ df.explode('ingredients')
 # +
 # pandas tricks from Kevin Markham
 # Does your Series contain comma-separation items?
-
+# 2
 df = pd.DataFrame({'sandwich':['PB&J','BLT','cheese'],
              'ingredients':['peanut butter,jelly',
                            'bacon,lettuce,tomato',
@@ -1208,7 +1212,7 @@ df.assign(
 # pandas tricks from Kevin Markham
 # Does your Series contain comma-separation items?
 # And you want to expand them to new columns
-
+# 3
 df = pd.DataFrame({'sandwich':['PB&J','BLT','cheese'],
              'ingredients':['peanut butter,jelly',
                            'bacon,lettuce,tomato',
@@ -1226,7 +1230,37 @@ add_prefix('ingredients_')
 # +
 # pandas tricks from Kevin Markham
 # Check your merge dataframe keys
+# 4
 df1 = pd.util.testing.makeMixedDataFrame()
 df2 = df1.drop([2,3], axis='rows')
 
 pd.merge(df1, df2, how='left',indicator=True) 
+
+# +
+# pandas tricks from Kevin Markham
+# 5. agg of groupby
+# hint
+# 使用good的方法來避免多層的multi-index，tidy-form讓後續的分析更為方便
+titanic = pd.read_csv('http://bit.ly/kaggletrain')
+bad_idea = titanic.groupby('Pclass').agg({'Age':['mean','max'],
+                                          'Survived':['mean']})
+good = titanic.groupby('Pclass').agg(ave_age=('Age','mean'),
+                                    max_age=('Age','max'),
+                                    survival_rate=('Survived','mean'))
+def tidy_groupby_df(df):
+    tidy_df =  titanic.groupby('Pclass').agg(ave_age=('Age','mean'),
+                                    max_age=('Age','max'),
+                                    survival_rate=('Survived','mean'))
+
+    return tidy_df.reset_index()
+
+tidy_df = tidy_groupby_df(titanic)
+    
+display(bad_idea,
+       good, 
+        tidy_df)
+
+
+# -
+
+
