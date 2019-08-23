@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.4'
-#       jupytext_version: 1.1.6
+#       jupytext_version: 1.1.3
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -1262,5 +1262,39 @@ display(bad_idea,
 
 
 # -
+# pandas tricks from Kevin Markham
+# 6. read multiple csv file and keep in a dictionary
+# create random data
+FOLDER_DIR = './csvset'
+for i in range(11):
+    path = FOLDER_DIR + '/' + f'data_{i}.csv'
+    pd.DataFrame(np.random.randint(low=5, high=100, size=(10,10))).\
+    to_csv(path, index=False)
+# read it
+from glob import glob
+DATA_PATH_LIST = glob('./csvset/*.csv')
+PREFIX = 'data'
+dfSet = {}
+for idx, path in enumerate(DATA_PATH_LIST):
+    df_name = PREFIX + f'_{idx}'
+    dfSet[df_name] = pd.read_csv(path)
+    display(df_name,
+           dfSet[df_name].head(2))
 
 
+# +
+# pandas tricks from Kevin Markham
+# 6-1 read multiple csv file and keep in a dictionary
+# create random data
+FOLDER_DIR = './csvset'
+for i in range(11):
+    path = FOLDER_DIR + '/' + f'data_{i}.csv'
+    pd.DataFrame(np.random.randint(low=5, high=100, size=(10,10))).\
+    to_csv(path, index=False)
+# concat it
+from glob import glob
+DATA_PATH_LIST = glob('./csvset/*.csv')
+dfList = [pd.read_csv(file) for file in DATA_PATH_LIST]
+
+# concat
+pd.concat(dfList, ignore_index=True)
