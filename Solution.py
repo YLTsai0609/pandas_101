@@ -1298,3 +1298,16 @@ dfList = [pd.read_csv(file) for file in DATA_PATH_LIST]
 
 # concat
 pd.concat(dfList, ignore_index=True)
+# -
+
+# pandas tricks from Kevin Markham
+# Miltiple filter creteria can be hard to write and read
+df = pd.read_csv('http://bit.ly/drinksbycountry')
+# save as object and use reduce 
+crit1 = df.continent == 'Europe'
+crit2 = df.beer_servings > 200
+crit3 = df.wine_servings > 200
+crit4 = df.spirit_servings > 100
+from functools import reduce
+criteria = reduce(lambda x, y : x & y, [crit1, crit2, crit3, crit4])
+df[criteria]
