@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.4'
-#       jupytext_version: 1.1.3
+#       jupytext_version: 1.1.6
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -163,8 +163,9 @@ ser.iloc[pos]
 ser1 = pd.Series(range(5))
 ser2 = pd.Series(list('abcde'))
 
-df1 = pd.concat([ser1,ser2], axis=0).to_frame()
-df2 = pd.concat([ser1,ser2], axis=1)
+df1 = pd.concat([ser1,ser2], axis='index').to_frame()
+df2 = pd.concat([ser1,ser2], axis='columns')
+display(df1.head(), df2)
 
 # +
 # 16. How to get the positions of items of series A in another series B?
@@ -1183,7 +1184,7 @@ df = pd.DataFrame({'sandwich':['PB&J','BLT','cheese'],
                            ['swiss cheese']]},
             index=['a','b','c'])
 
-
+display(df)
 df.explode('ingredients')
 # Hint new method in 0.25
 # Data Cleaning 時非常有用
