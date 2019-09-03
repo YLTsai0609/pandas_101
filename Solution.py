@@ -1312,3 +1312,15 @@ crit4 = df.spirit_servings > 100
 from functools import reduce
 criteria = reduce(lambda x, y : x & y, [crit1, crit2, crit3, crit4])
 df[criteria]
+
+# +
+# pandas tricks from Kevin Markham
+# mash up cat and wl , read_csv skiprows, header
+
+# step 1 (find file) ! ls ./csvset/data_0.csv
+# ! cat ./csvset/data_0.csv # step 2 , take a look
+# # ! wc -l ./csvset/data_0.csv # step 3 count all rows if you want to
+pd.read_csv('./csvset/data_0.csv',header=0)
+# -
+
+
