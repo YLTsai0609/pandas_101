@@ -1322,5 +1322,22 @@ df[criteria]
 # # ! wc -l ./csvset/data_0.csv # step 3 count all rows if you want to
 pd.read_csv('./csvset/data_0.csv',header=0)
 # -
+df
+
+df.pop?
+
+# pandas tricks from Kevin Markham
+# remove a column from a DataFrame and store it as a separate Series?
+# use pop
+df = pd.DataFrame([('falcon', 'bird', 389.0),
+                    ('parrot', 'bird', 24.0),
+                    ('lion', 'mammal', 80.5),
+                    ('monkey','mammal', np.nan)],
+                   columns=('name', 'class', 'max_speed'))
+display(df.shape)
+popped_series = df.pop('max_speed')
+display(df.shape,
+       popped_series.head())
+
 
 
