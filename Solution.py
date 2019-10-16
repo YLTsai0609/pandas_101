@@ -1165,6 +1165,37 @@ get_tidy_df(s)
 # -
 
 
+# +
+# 4
+# vectorlized your costum function for pandas 
+# use the function without elementwise - operation
+####### example
+# import jieba
+# result = [seg for seg in jieba.cut("我愛Python")]
+# print(result)
+####### Vectorlized Solution
+####### This is provide extremly fast operation 
+####### when you have large text need to deal with
+df = pd.DataFrame({'TextCol':['我愛Python','Python愛我','對我來說，R語言算什麼']})
+def segmentation(sentence : str) -> 'list':
+    '''
+    get segmentation of a sentence
+    '''
+    return [seg for seg in jieba.cut(sentence)]
+
+vec_segmentation = np.vectorize(segmentation, otypes=[list])
+vec_segmentation(df['TextCol'].values)
+df['Segmentation'] = vec_segmentation(df['TextCol'].values)
+df
+
+# Hint : 使用 segmentation(df['TextCol']) 沒辦法過，series會出現無法encode
+# 單純使用vectorlize也沒辦法過，錯誤訊息說我們想把一個sequence放進一個value
+# 所以我們把output-type變為list，就可以被認得，如果你有一個100 million + 的dataframe需要做segmentation
+# 這會比apply快上100倍
+# efficiency https://engineering.upside.com/a-beginners-guide-to-optimizing-pandas-code-for-speed-c09ef2c6a4d6
+
+# -
+
 
 
 
@@ -1322,10 +1353,6 @@ df[criteria]
 # # ! wc -l ./csvset/data_0.csv # step 3 count all rows if you want to
 pd.read_csv('./csvset/data_0.csv',header=0)
 # -
-df
-
-df.pop?
-
 # pandas tricks from Kevin Markham
 # remove a column from a DataFrame and store it as a separate Series?
 # use pop
@@ -1338,6 +1365,22 @@ display(df.shape)
 popped_series = df.pop('max_speed')
 display(df.shape,
        popped_series.head())
+
+# +
+# pandas tricks from Kevin Markham
+# Do you need to build a DataFrame from multiple files,
+# but also keep track of which row came from which file?
+
+from glob import glob
+DATA_PATH_LIST = glob('./csvset/*.csv')
+print(DATA_PATH_LIST)
+# use generator expression
+csv_geberator = (pd.read_csv(file).assign(file_name = file)
+                 for file in DATA_PATH_LIST)
+
+# concat
+pd.concat(csv_geberator, ignore_index=True)
+# -
 
 
 
