@@ -1162,7 +1162,6 @@ def get_tidy_df(s):
     return tmp
 
 get_tidy_df(s)
-# -
 
 
 # +
@@ -1176,6 +1175,7 @@ get_tidy_df(s)
 ####### Vectorlized Solution
 ####### This is provide extremly fast operation 
 ####### when you have large text need to deal with
+import jieba
 df = pd.DataFrame({'TextCol':['我愛Python','Python愛我','對我來說，R語言算什麼']})
 def segmentation(sentence : str) -> 'list':
     '''
@@ -1195,13 +1195,59 @@ df
 # efficiency https://engineering.upside.com/a-beginners-guide-to-optimizing-pandas-code-for-speed-c09ef2c6a4d6
 
 # -
+# 5 
+# need expand data in your df into columns?
+# pivot -> reset_index() ->  columns.name = None
+df = pd.DataFrame({
+                   'imageId':['video10_image1','video10_image1','video10_image1',
+                              'video10_image1','video10_image1'],
+                   'label':['nose','left eye','right eye','left ear', 'right ear'],
+                   'label_x':[177.0, 179.0, 179.0, 186.0, 188.0]
+                  })
+pivot = df.pivot(index='imageId',columns='label', values='label_x')
+pivot_getIdx = pivot.reset_index()
+display(df, 
+       pivot,
+       pivot_getIdx)
+pivot_getIdx.columns.name = None
+display('the most tricky part,actually "label" is a name of coumns instead of a column!',
+        pivot_getIdx)
+# More Readable -> add suffix
+pivotMoreReadable = df.pivot(index='imageId',columns='label', values='label_x').add_suffix('_x').reset_index()
+pivotMoreReadable.columns.name = None
+display(pivotMoreReadable)
+
+# +
+# 6 multiple merge
+# pd.concat cannot do that!
+# functional programming with pd.merge!
+########### Create data ##########
+FOLDER_DIR = './csvset'
+for i in range(11):
+    path = FOLDER_DIR + '/' + f'data_{i}.csv'
+    pd.DataFrame(np.random.randint(low=5, high=100, size=(10,10))).\
+    to_csv(path, index=False)
+# read it
+from glob import glob
+DATA_PATH_LIST = glob('./csvset/*.csv')
+PREFIX = 'data'
+dfSet = {}
+for idx, path in enumerate(DATA_PATH_LIST):
+    df_name = PREFIX + f'_{idx}'
+    dfSet[df_name] = pd.read_csv(path).add_prefix(f'{df_name}_').reset_index()
+############ multiple merge #############
+from functools import reduce
+JOINKEY = 'index'
+dfList = []
+for _, df in dfSet.items():
+    dfList.append(df)
+df_all_merged = reduce(lambda left, right : pd.merge(left, right, on=JOINKEY), dfList)
+display(df_all_merged.head())
 
 
+# Hint, when you think about recussive solution -> functional programming might work
 
-
-
-
-
+# -
 
 # # pandas tricks from Kevin Markham
 
@@ -1381,6 +1427,8 @@ csv_geberator = (pd.read_csv(file).assign(file_name = file)
 # concat
 pd.concat(csv_geberator, ignore_index=True)
 # -
+
+
 
 
 
