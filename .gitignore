@@ -3,5 +3,6 @@
 .vscode
 .DS_Store
 __pycache__/
+/GeoData/*.csv
 
 

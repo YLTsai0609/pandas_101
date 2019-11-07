@@ -36,6 +36,7 @@ You Must...... &rarr; 自己寫，並考慮更好的寫法。從[Pandas 101](htt
 有經驗的Data Scientist : 
 * 翻找一些[pandas trick](#trick)，讓自己的工作更有效率。
 * 貢獻自己的Pandas trick，為更多初學者指引一盞明燈。
+* 一起來學習[GeoPandas](#GeoPandas)
 
 
 **********************************************
@@ -59,3 +60,13 @@ You Must...... &rarr; 自己寫，並考慮更好的寫法。從[Pandas 101](htt
 * [Reshaping and Tidy Data](https://github.com/TomAugspurger/effective-pandas/blob/master/modern_5_tidy.ipynb)
 
 * [Tidy Data in Chaitify example notebook](https://github.com/spotify/chartify/blob/master/examples/Chartify%20Tutorial.ipynb)
+
+
+**********************************************
+
+<h2 id=GeoPandas>GeoPandas 101</h2>
+
+* [Geospatial_Analysis from Kaggle](https://www.kaggle.com/learn/geospatial-analysis)
+* dependency :
+  * geopandas==0.6.1
+  * descartes==1.1.0 (for plotting map)
