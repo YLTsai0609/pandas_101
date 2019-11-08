@@ -1426,9 +1426,24 @@ csv_geberator = (pd.read_csv(file).assign(file_name = file)
 
 # concat
 pd.concat(csv_geberator, ignore_index=True)
+# + {}
+# pandas tricks from Kevin Markham
+# create a training set dtype_validator?
+# 1 Create a CSV of column names & dtypes
+# 2 Read it into a DataFrame, then convery it into a dictionary
+# Use the dictionary to specify dtypes of the data
+
+# When to use? 
+# you have 50+ columns from different source and device....
+# Why we use a pickle for dictionary? 
+# we need to pick one readable for human, makes more maintainable
+# we pick json instead of csv, because json is smaller
+# hints : json only takes double quote, single quote is invalid...
+import json
+with open('validator_reference/column_dtypes.json', 'r') as file:
+    dtypes = json.loads(file.read())
+df = pd.read_csv('http://bit.ly/drinksbycountry', dtype=dtypes)
+display(df.dtypes)
 # -
-
-
-
 
 
