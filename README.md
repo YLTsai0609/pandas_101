@@ -70,3 +70,5 @@ You Must...... &rarr; 自己寫，並考慮更好的寫法。從[Pandas 101](htt
 * dependency :
   * geopandas==0.6.1
   * descartes==1.1.0 (for plotting map)
+  * folium==0.10.0
+

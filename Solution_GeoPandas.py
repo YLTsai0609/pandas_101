@@ -13,15 +13,23 @@
 #     name: python3
 # ---
 
-# ## There are alternative solution and hits: 
-# ### more readable
+# # Pratical GeoPandas usage
 #
-# ### more effient (vectorlized)
+
+# # Geo-Encoding
+# * coordinate <---> landmark, adress
 #
-# ### when to use it?
+# `from geopandas.tools import geocode`
 #
-# ### hints
+# > Open
 #
+# *[OpenStreetMap Nominatim geocoder](https://nominatim.openstreetmap.org/)
+#
+# > Payment needed
+#
+# * [google map](https://www.google.com/maps/@25.0539054,121.5754524,13z)
+# * [Bing map](https://www.bing.com/maps)
+# * [Baidu](https://map.baidu.com/)
 
 # # GeoPandas 101
 
@@ -34,8 +42,22 @@ print(gpd.__version__)
 # 2. What class / method / arrtibutes in geopandas?
 print(dir(gpd))
 
+
 # +
 # 3 how to create a GeoDataFrame from FataFrame
 
 # +
 # 4 how to read file with shp file
+
+# +
+# 5 use geocoder to get coordinate from adress
+
+def my_geocoder(row):
+    try:
+        point = geocode(row, provider='nominatim').geometry.iloc[0]
+        return pd.Series({'Latitude': point.y, 'Longitude': point.x, 'geometry': point})
+    except:
+        return None
+# -
+
+
