@@ -1444,6 +1444,38 @@ with open('validator_reference/column_dtypes.json', 'r') as file:
     dtypes = json.loads(file.read())
 df = pd.read_csv('http://bit.ly/drinksbycountry', dtype=dtypes)
 display(df.dtypes)
+# + {}
+# pandas tricks from Kevin Markham
+# read  big csv into data-frame?
+# Randomly sample the dataset  *during file reading* by *skiprows*
+
+# create the data if not exist
+import os 
+if 'huge_dataset.csv' not in os.listdir('./csvset'):
+    data = np.random.uniform(0, 1, (100000, 100))
+    pd.DataFrame(data).to_csv('./csvset/huge_dataset.csv', index=False)
+
+
+# neat
+print('we have 100000 raws huge data!')
+df = pd.read_csv('./csvset/huge_dataset.csv', 
+                skiprows = lambda x : x > 0 and np.random.rand() > 0.01)
+
+print('sample data with fraction 1 %',df.shape)
+
+# clearn the data
+import subprocess
+
+delete_file = 'rm ./csvset/huge_dataset.csv'
+subprocess.run(delete_file, shell=True, check=True)
 # -
+
+
+# ## How it works?
+# * `skiprows` accepts a function that is evaluated against the integer index
+# * `x > 0`ensures that the header row is **not** skipped
+# * `np.random.rand() > 0.01` return **True** 99% of the time, thus skip 99% of the rows
+# ### different with sample
+# * `sample` need whole dataset in dataframe!
 
 
