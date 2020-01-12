@@ -1478,4 +1478,21 @@ subprocess.run(delete_file, shell=True, check=True)
 # ### different with sample
 # * `sample` need whole dataset in dataframe!
 
+# +
+# pandas tricks from Kevin Markham
+# Want to convert "year" and "day of year" into a single datetime column? 📆
+# 1. Combine them into one number
+# 2. Convert to datetime and specify its format
+
+df = pd.DataFrame({'year':[2019,2019,2020],
+                  'day_of_yesr':[350, 365, 1]})
+
+# step 1 
+df['combined'] = df['year'] * 1000 + df['day_of_yesr']
+
+# step 2
+df['date'] = pd.to_datetime(df['combined'], format='%Y%j')
+df
+# -
+
 
