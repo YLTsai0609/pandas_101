@@ -2,12 +2,13 @@
 # ---
 # jupyter:
 #   jupytext:
+#     cell_metadata_json: true
 #     formats: ipynb,py:light
 #     text_representation:
 #       extension: .py
 #       format_name: light
-#       format_version: '1.4'
-#       jupytext_version: 1.1.6
+#       format_version: '1.5'
+#       jupytext_version: 1.3.4
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -143,7 +144,7 @@ ser = pd.Series(np.random.randint(1, 10, 7))
 
 
 
-np.argwhere(ser % 3 == 0)
+# np.argwhere(ser % 3 == 0)
 
 # hint
 # np.where, pd.where 傳回整個series
@@ -174,10 +175,11 @@ ser1 = pd.Series([10, 9, 6, 5, 3, 1, 12, 8, 13])
 ser2 = pd.Series([1, 3, 10, 13])
 
 # vectorlized
-np.argwhere(ser1.isin(ser2)).reshape(-1).tolist()
+mask = ser1.isin(ser2)
+np.argwhere(mask.values).reshape(-1).tolist()
 
 # np.where進行項量化的操作, 在資料量大時可以保證一定的速度
-# + {}
+# +
 # 17. How to compute the mean squared error on a truth and predicted series?
 # Difficulty Level: L2
 truth = pd.Series(range(10))
@@ -223,7 +225,7 @@ print((middle_result - tmp2).tolist())
 print('-'*60)
 print(ser.diff().tolist())
 print(ser.diff().diff().tolist())
-# + {}
+# +
 # 21. How to convert a series of date-strings to a timeseries?
 # Difficiulty Level: L2
 
@@ -254,7 +256,7 @@ tmp = pd.to_datetime(ser)
 Date = tmp.dt.day.tolist()
 Week_number = tmp.dt.weekofyear.tolist()
 Day_num_of_year = tmp.dt.dayofyear.tolist()
-Dayofweek = tmp.dt.weekday_name.tolist()
+Dayofweek = tmp.dt.weekday.tolist()
 
 print(f''' 
 Date : {Date}
@@ -330,7 +332,7 @@ print(tmp['weights'])
 # 操作dataframe時我們通常都直接在dataframe裡面groupby, 這題告訴我們
 # series 可以 groupby 另一條series, 之間用index作為對應, 
 # 這讓feature engineering時能夠有更好的彈性
-# + {}
+# +
 # 27. How to compute the euclidean distance between two series?
 # Difficiulty Level: L2
 
@@ -341,21 +343,21 @@ sum((p - q) ** 2) ** 0.5
 
 
 # +
-# 28. How to find all the local maxima (or peaks) in a numeric series?
-# Difficiulty Level: L3
+# # 28. How to find all the local maxima (or peaks) in a numeric series?
+# # Difficiulty Level: L3
 
-# Get the positions of peaks (values surrounded by smaller values on both sides) in ser.
+# # Get the positions of peaks (values surrounded by smaller values on both sides) in ser.
 
-ser = pd.Series([2, 10, 3, 4, 9, 10, 2, 7, 3])
+# ser = pd.Series([2, 10, 3, 4, 9, 10, 2, 7, 3])
 
-# more readable
-peak_locs = np.argwhere(np.sign(ser.diff(1)) +\
-                        np.sign(ser.diff(-1)) == 2).reshape(-1) 
+# # more readable
+# peak_locs = np.argwhere(np.sign(ser.diff(1)) +\
+#                         np.sign(ser.diff(-1)) == 2).reshape(-1) 
 
-# hint
-# 使用diff(-1)，來取得backward
-# 同樣性質的方法還有pd.Series.shift
-peak_locs
+# # hint
+# # 使用diff(-1)，來取得backward
+# # 同樣性質的方法還有pd.Series.shift
+# peak_locs
 
 # +
 # 29. How to replace missing spaces in a string with the least frequent character?
@@ -391,6 +393,28 @@ pd.Series(index = dateime_idx,
 # hint 
 # 要在pandas中找到pd.date_range這個方法實在很難找......
 # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.date_range.html
+
+
+# +
+# 30 - 2
+# create date index / date column - with dataframe length
+from datetime import datetime, timedelta
+
+data = np.random.randint(2, 8, size=100)
+
+date_start = datetime(2018, 1, 1)
+days = pd.date_range(date_start,
+                     date_start + timedelta(len(data) - 1),
+                     freq='D') # sart, end, freq
+
+
+
+# days = pd.date_range('2018-01-01', periods=1, freq='D')
+df = pd.DataFrame({'value':data,'date':days})
+
+display(df.head(),
+       df.dtypes,
+       df.set_index('date'))
 
 
 # +
@@ -492,81 +516,81 @@ df_list = df.values.tolist()
 
 
 # +
-# 38. How to extract the row and column number of a particular cell with given criterion?
-# Difficulty Level: L1
+# # 38. How to extract the row and column number of a particular cell with given criterion?
+# # Difficulty Level: L1
 
-df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
+# df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
 
-# More Readable
-highest_price = df['Price'].max()
-# the dataframe rows
-df.query(f'Price == {highest_price}')
-# the row idx and col idx
-row, col = np.argwhere(df.values == np.max(df.Price)).reshape(-1)
-print(row, col)
-# + {}
-# 39. How to rename a specific columns in a dataframe?
-# Difficulty Level: L2
+# # More Readable
+# highest_price = df['Price'].max()
+# # the dataframe rows
+# df.query(f'Price == {highest_price}')
+# # the row idx and col idx
+# row, col = np.argwhere(df.values == np.max(df.Price)).reshape(-1)
+# print(row, col)
+# +
+# # 39. How to rename a specific columns in a dataframe?
+# # Difficulty Level: L2
 
-# Rename the column Type as CarType in df and replace the ‘.’ in column names with ‘_’.
-df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
+# # Rename the column Type as CarType in df and replace the ‘.’ in column names with ‘_’.
+# df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
 
-tmp = [col.replace('.','_') for col in df.columns]
-df.columns = tmp
-df = df.rename(columns={'Type':'CarType'})
-df.columns
+# tmp = [col.replace('.','_') for col in df.columns]
+# df.columns = tmp
+# df = df.rename(columns={'Type':'CarType'})
+# df.columns
 
-# When to use
-# 第一次拿到資料時，針對特徵欄位做資料清理
-# 甚至會加註categorical feature CAT_FeatureName
-# Numerical feature Num_FeatureName......等
+# # When to use
+# # 第一次拿到資料時，針對特徵欄位做資料清理
+# # 甚至會加註categorical feature CAT_FeatureName
+# # Numerical feature Num_FeatureName......等
 
 
 # +
-# 40. How to check if a dataframe has any missing values?
-# Difficulty Level: L1
-df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
+# # 40. How to check if a dataframe has any missing values?
+# # Difficulty Level: L1
+# df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
 
-df.isnull().any().any()
-
-# +
-# 41. How to count the number of missing values in each column?
-# Difficulty Level: L2
-df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
-
-nan_p_series = df.isnull().sum() / len(df)
-nan_p_series.sort_values(ascending=False).head(1)
-
-# when to use
-# 缺失值統計，近乎每次必用
+# df.isnull().any().any()
 
 # +
-# 42. How to replace missing values of multiple numeric columns with the mean?
-# Difficulty Level: L2
+# # 41. How to count the number of missing values in each column?
+# # Difficulty Level: L2
+# df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
 
-df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
+# nan_p_series = df.isnull().sum() / len(df)
+# nan_p_series.sort_values(ascending=False).head(1)
 
-for col in ['Min.Price','Max.Price']:
-    respective_mean = df[col].mean()
-    df[col] = df[col].fillna(respective_mean)
-
-df[['Min.Price','Max.Price']].isnull().any().any()
+# # when to use
+# # 缺失值統計，近乎每次必用
 
 # +
-# 43. How to use apply function on existing columns with global variables as additional arguments?
-# Difficulty Level: L3
+# # 42. How to replace missing values of multiple numeric columns with the mean?
+# # Difficulty Level: L2
 
-# In df, use apply method to replace the missing values in Min.Price with the column’s mean and those in Max.Price with the column’s median.
+# df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
 
-df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
+# for col in ['Min.Price','Max.Price']:
+#     respective_mean = df[col].mean()
+#     df[col] = df[col].fillna(respective_mean)
 
-d = {'Min.Price': np.nanmean, 'Max.Price': np.nanmedian}
-df[['Min.Price', 'Max.Price']] = df[['Min.Price', 'Max.Price']]\
-.apply(lambda x, d: x.fillna(d[x.name](x)), args=(d, ))
+# df[['Min.Price','Max.Price']].isnull().any().any()
 
-# Vectorlized 
-# 使用 42題的方式，改成median填入，是向量化操作
-# 在資料量大時會快非常多
+# +
+# # 43. How to use apply function on existing columns with global variables as additional arguments?
+# # Difficulty Level: L3
+
+# # In df, use apply method to replace the missing values in Min.Price with the column’s mean and those in Max.Price with the column’s median.
+
+# df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
+
+# d = {'Min.Price': np.nanmean, 'Max.Price': np.nanmedian}
+# df[['Min.Price', 'Max.Price']] = df[['Min.Price', 'Max.Price']]\
+# .apply(lambda x, d: x.fillna(d[x.name](x)), args=(d, ))
+
+# # Vectorlized 
+# # 使用 42題的方式，改成median填入，是向量化操作
+# # 在資料量大時會快非常多
 
 # +
 # 44. How to select a specific column from a dataframe as a dataframe instead of a series?
@@ -668,23 +692,23 @@ col = ['Manufacturer','Model','Type']
 df[col].iloc[idx]
 
 # +
-# 50. How to create a primary key index by combining relevant columns?
-# Difficulty Level: L2
+# # 50. How to create a primary key index by combining relevant columns?
+# # Difficulty Level: L2
 
-# In df, Replace NaNs with ‘missing’ in columns 'Manufacturer', 'Model' and 'Type' 
-# and create a index as a combination of these three columns and check if the index is a primary key.
+# # In df, Replace NaNs with ‘missing’ in columns 'Manufacturer', 'Model' and 'Type' 
+# # and create a index as a combination of these three columns and check if the index is a primary key.
 
-df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv', usecols=[0,1,2,3,5])
+# df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv', usecols=[0,1,2,3,5])
 
-col = ['Manufacturer','Model','Type']
-idx_col = '.Price'
-df[col] = df[col].fillna('missing')
-df.index = df.Manufacturer + '_' + df.Model + '_' + df.Type
-display(df.head(),
-       df.index.is_unique)
-# When to use
-# 根據column內容來設置 Primary key的手法非常實用
-# 容易給其他同事進行表格閱讀
+# col = ['Manufacturer','Model','Type']
+# idx_col = '.Price'
+# df[col] = df[col].fillna('missing')
+# df.index = df.Manufacturer + '_' + df.Model + '_' + df.Type
+# display(df.head(),
+#        df.index.is_unique)
+# # When to use
+# # 根據column內容來設置 Primary key的手法非常實用
+# # 容易給其他同事進行表格閱讀
 
 # +
 # 51. How to get the row number of the nth largest value in a column?
@@ -719,7 +743,7 @@ df = pd.DataFrame(np.random.randint(10, 40, 60).reshape(-1, 4))
 # More readable
 df['RowSum'] = df.sum(axis=1)
 df.query('RowSum > 100').tail(2)
-# + {}
+# +
 # 54. How to find and cap outliers from a series or dataframe column?
 # Difficulty Level: L2
 
@@ -866,7 +890,7 @@ get_neast_and_euclidean_dist(df)
 # 計算距離時, pdist, squareform
 # 提供了非常多基於numpy計算的距離，包含euclidean, cosine, correlation,
 # hamming, 等等, 非常實用
-# + {}
+# +
 # 61. How to know the maximum possible correlation value of each column against other columns?
 # Difficulty Level: L2
 
@@ -969,7 +993,7 @@ df
 # 因此 new_array = np.fill_diagonal(df.values, 0), new_array會為None
 # pd.DataFrame.values 只能呼叫，無法直接帶入值
 # 因此 df.vales = np.fill_diagonal(df.values, 0) 不會work
-# + {}
+# +
 # 67. How to get the particular group of a groupby dataframe by key?
 # Difficulty Level: L2
 
@@ -1033,7 +1057,7 @@ df2 = pd.DataFrame({'pazham': ['apple', 'orange', 'pine'] * 2,
 pd.merge(df1, df2, left_on = ['fruit','weight'],
                     right_on = ['pazham','kilo'],
                     how = 'inner')
-# + {}
+# +
 # 71. How to remove rows from a dataframe that are present in another dataframe?
 # Difficulty Level: L3
 
@@ -1050,7 +1074,7 @@ display(df1,
 # More readable result
 mask = ~ df1.isin(df2).all(axis='columns')
 df1[mask]
-# + {}
+# +
 # 72. How to get the positions where values of two columns match?
 # Difficulty Level: L2
 df = pd.DataFrame({'fruit1': np.random.choice(['apple', 'orange', 'banana'], 10),
@@ -1100,7 +1124,7 @@ df_out = df_out[1:]
 df_out.columns = new_header
 df_out
 # -
-# # Some function you should know...
+# # Some functionality you should know...
 
 # +
 1.
@@ -1175,18 +1199,20 @@ get_tidy_df(s)
 ####### Vectorlized Solution
 ####### This is provide extremly fast operation 
 ####### when you have large text need to deal with
-import jieba
-df = pd.DataFrame({'TextCol':['我愛Python','Python愛我','對我來說，R語言算什麼']})
-def segmentation(sentence : str) -> 'list':
-    '''
-    get segmentation of a sentence
-    '''
-    return [seg for seg in jieba.cut(sentence)]
 
-vec_segmentation = np.vectorize(segmentation, otypes=[list])
-vec_segmentation(df['TextCol'].values)
-df['Segmentation'] = vec_segmentation(df['TextCol'].values)
-df
+
+# import jieba
+# df = pd.DataFrame({'TextCol':['我愛Python','Python愛我','對我來說，R語言算什麼']})
+# def segmentation(sentence : str) -> 'list':
+#     '''
+#     get segmentation of a sentence
+#     '''
+#     return [seg for seg in jieba.cut(sentence)]
+
+# vec_segmentation = np.vectorize(segmentation, otypes=[list])
+# vec_segmentation(df['TextCol'].values)
+# df['Segmentation'] = vec_segmentation(df['TextCol'].values)
+# df
 
 # Hint : 使用 segmentation(df['TextCol']) 沒辦法過，series會出現無法encode
 # 單純使用vectorlize也沒辦法過，錯誤訊息說我們想把一個sequence放進一個value
@@ -1248,6 +1274,8 @@ display(df_all_merged.head())
 # Hint, when you think about recussive solution -> functional programming might work
 
 # -
+
+
 
 # # pandas tricks from Kevin Markham
 
@@ -1426,7 +1454,7 @@ csv_geberator = (pd.read_csv(file).assign(file_name = file)
 
 # concat
 pd.concat(csv_geberator, ignore_index=True)
-# + {}
+# +
 # pandas tricks from Kevin Markham
 # create a training set dtype_validator?
 # 1 Create a CSV of column names & dtypes
@@ -1444,7 +1472,7 @@ with open('validator_reference/column_dtypes.json', 'r') as file:
     dtypes = json.loads(file.read())
 df = pd.read_csv('http://bit.ly/drinksbycountry', dtype=dtypes)
 display(df.dtypes)
-# + {}
+# +
 # pandas tricks from Kevin Markham
 # read  big csv into data-frame?
 # Randomly sample the dataset  *during file reading* by *skiprows*
@@ -1493,6 +1521,82 @@ df['combined'] = df['year'] * 1000 + df['day_of_yesr']
 # step 2
 df['date'] = pd.to_datetime(df['combined'], format='%Y%j')
 df
+# -
+# # pandas trick from LeeMeng
+
+
+# +
+# 找出符合特定字串的樣本
+
+df = pd.read_csv('http://bit.ly/kaggletrain')
+df[df.Name.str.contains("Mr\.")].head(5)
+
+
+
+# +
+# 用正規表達式來選data
+# 尤其是時間序列
+
+df_date = pd.util.testing.makeTimeDataFrame(freq='7D')
+df_date.head(10)
+# -
+
+
+# a more readable way to filter by index with alomst any operatioms
+df_date.filter(regex="2000-02.*", axis=0)
+
+# +
+# 選取從某段時間開始的區間樣本
+#        df_date.between_time(start_time=datetime(2000, 2, 5),
+#                           end_time=datetime(2000, 3, 19))
+# will not work
+# do a old school way
+from datetime import datetime
+def between(df : pd.DataFrame, 
+            start_date : datetime,
+            end_date : datetime,
+           *args) -> pd.DataFrame:
+    assert isinstance(df.index, pd.DatetimeIndex), 'index is not DatetimeIndex format'
+    mask = (df.index > start_date) & (df.index <= end_date)
+    return df[mask]
+    
+
+display(df_date.first('3W'),
+       between(df_date,start_date=datetime(2000,1, 15),
+              end_date=datetime(2000, 3, 10)))
+
+# +
+# for loop but want multiple row
+df_city = pd.DataFrame({
+    'state': ['密蘇里州', '亞利桑那州', '肯塔基州', '紐約州'],
+    'city': ['堪薩斯城', '鳳凰城', '路易維爾', '紐約市']
+})
+
+for row in df_city.itertuples(name='City'):
+    print(f'{row.city}是{row.state}裡頭的一個城市')
+
+    
+# itertuples is exactly namedtuple
+from collections import namedtuple
+
+City = namedtuple('City', ['Index', 'state', 'city'])
+c = City(3, '紐約州', '紐約市')
+c == row
+
+# +
+# swifter, star 1.2k, then might be well tested
+# https://github.com/jmcarpenter2/swifter
+# use swifter auto vectorlization of your code
+# but keep your ability to write vectorlize code :P
+# actually apply support numba backend now!
+
+import swifter
+df = pd.DataFrame(pd.np.random.rand(1000000, 1), columns=['x'])
+
+# %timeit -n 10 df['x2'] = df['x'].apply(lambda x: x**2)
+# %timeit -n 10 df['x2'] = df['x'].swifter.apply(lambda x: x**2)
+
+
 # -
 
 
