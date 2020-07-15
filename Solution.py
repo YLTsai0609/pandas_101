@@ -678,18 +678,18 @@ df = pd.DataFrame(np.random.random(4), columns=['random'])
 df.style.format({'random':'{0:.2%}'.format,})
 
 # +
-# 49. How to filter every nth row in a dataframe?
-# Difficulty Level: L1
+# # 49. How to filter every nth row in a dataframe?
+# # Difficulty Level: L1
 
-# From df, filter the 'Manufacturer', 'Model' and 'Type' for every 20th row starting from 1st (row 0).
+# # From df, filter the 'Manufacturer', 'Model' and 'Type' for every 20th row starting from 1st (row 0).
 
-df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
+# df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/Cars93_miss.csv')
 
-# More readable
+# # More readable
 
-idx = np.arange(0, df.shape[0], step=20)
-col = ['Manufacturer','Model','Type']
-df[col].iloc[idx]
+# idx = np.arange(0, df.shape[0], step=20i)
+# col = ['Manufacturer','Model','Type']
+# df[col].iloc[idx]
 
 # +
 # # 50. How to create a primary key index by combining relevant columns?
@@ -1123,11 +1123,61 @@ new_header = df_out.iloc[0]
 df_out = df_out[1:]
 df_out.columns = new_header
 df_out
+# +
+# 76
+# complex logic in groupby....
+# given a dataframe
+# want per group value_1 biggest, if only one value in the group
+# just keep it
+df = pd.DataFrame({'key':[1,2,3,4,4],
+              'value_1':[6,3,4,1,9],
+              'value_2':['a','b','c','e','d']})
+
+display(df)
+# df.index.name = 'original_idx'
+# idx = df.groupby('key')['value_1'].nlargest(1).reset_index()['original_idx']
+
+# df.iloc[idx]
+df.sort_values(by=['key','value_1']).groupby('key').head(1)
 # -
+
+np.random.random(size=10)
+
+# 77
+# groupby 3 level key, they have 50-1000 category
+# with 10e6 rows
+# make it more faster
+# solutions - make key to int
+# aggregation value to float
+# https://stackoverflow.com/questions/44704465/pandas-df-groupby-is-too-slow-for-big-data-set-any-alternatives-methods
+# sort first, do groupby later
+# https://stackoverflow.com/questions/54090952/why-is-pandas-nlargest-slower-than-mine
+df = pd.DataFrame({
+    'key_1':np.random.choice([str(i) for i in range(1000)],size=1000000),
+    'key_2':np.random.choice([str(i) for i in range(50)],size=1000000),
+    'key_3':np.random.choice([str(i) for i in range(1000)],size=1000000),
+    'value_1':np.random.random(size=1000000)
+})
+
+# +
+# # %%time
+# df.index.name = 'original_idx'
+# idx = df.groupby(['key_1','key_2','key_3'])['value_1'].nlargest(1).reset_index()['original_idx']
+# df.iloc[idx].head()
+
+# +
+# # %%time
+# df[['key_1','key_2','key_3']] = df[['key_1','key_2','key_3']].astype(int)
+# idx = df.groupby(['key_1','key_2','key_3'])['value_1'].nlargest(1).reset_index()['original_idx']
+# df.iloc[idx].head()
+# -
+
+# %%time
+df.sort_values(by=['key_1','key_2','key_3','value_1']).groupby(by=['key_1','key_2','key_3','value_1']).head(1)
+
 # # Some functionality you should know...
 
 # +
-1.
 # pd.DataFrame.melt
 # Person 1, 2, 3 週一至週日的某數值
 # make the dataframe display with -> columns:['weekday','PersonNo','Score']
@@ -1551,7 +1601,14 @@ df_date.filter(regex="2000-02.*", axis=0)
 #                           end_time=datetime(2000, 3, 19))
 # will not work
 # do a old school way
+########### package ############
+# import pandas as pd
 from datetime import datetime
+
+########### generate data ##############
+df_date = pd.util.testing.makeTimeDataFrame(freq='7D')
+df_date.head(10)
+########## functions ##############
 def between(df : pd.DataFrame, 
             start_date : datetime,
             end_date : datetime,
