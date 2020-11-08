@@ -1,4 +1,5 @@
 # Pandas 101
+
 大量的Series, DataFame操作經常讓你手足無措?
 
 資料處理 - 繁瑣，無趣，卻重要。
@@ -11,12 +12,12 @@ You Must...... &rarr; 自己寫，並考慮更好的寫法。從[Pandas 101](htt
 
 既然推薦自己寫，為何還會有這個 repository?
 
-
              解題之外，更好的寫法
 
 **********************************************
 
 ## Notebook中包含 : 
+
 每一題的解答 : (有作者自己解，也有網站上的解)，並且總結了 : 
 
 | 備註 | 描述 |
@@ -29,20 +30,25 @@ You Must...... &rarr; 自己寫，並考慮更好的寫法。從[Pandas 101](htt
 **********************************************
 
 ## 如何使用 ? 
+
 初學Data Science, Machine Learning : 
+
 * 從[Pandas 101](https://www.machinelearningplus.com/python/101-pandas-exercises-python/)，規劃1-3個月不等，每天3-5題
+
   鍛鍊出一個更好的自己。
 
 有經驗的Data Scientist : 
+
 * 翻找一些[pandas trick](#trick)，讓自己的工作更有效率。
 * 貢獻自己的Pandas trick，為更多初學者指引一盞明燈。
 * 一起來學習[GeoPandas](#GeoPandas)
 
-
 **********************************************
 
 ## 為何要建立這個 repository 呢？ 
+
 1. 作為一位自學Data Science的非本科生，有太多的內容需要我們去學習，從資料庫ETL，SQL，資料清理，探索式分析，特徵工程，建模，一直到模型解釋，橫跨了太多fancy的數學技巧，然而，在實現這些技術的背後，靠的是各項資料處理工具，包含Python中的numpy, pandas, dask, pyspark等。
+
 對資料的操作，貫穿了所有流程，練習資料處理，就像做重訓，有堅實的肌肉，才能跳得高，耐撞，讓我們能夠打一場好球。
 
 2. 繁體中文的好資源太少，作者貢獻自己的學習歷程，並期待拋磚引玉，引出更強的大神分享經驗！
@@ -61,14 +67,17 @@ You Must...... &rarr; 自己寫，並考慮更好的寫法。從[Pandas 101](htt
 
 * [Tidy Data in Chaitify example notebook](https://github.com/spotify/chartify/blob/master/examples/Chartify%20Tutorial.ipynb)
 
-
 **********************************************
 
 <h2 id=GeoPandas>GeoPandas 101</h2>
 
 * [Geospatial_Analysis from Kaggle](https://www.kaggle.com/learn/geospatial-analysis)
 * dependency :
-  * geopandas==0.6.1
-  * descartes==1.1.0 (for plotting map)
-  * folium==0.10.0
+  + geopandas==0.6.1
+  + descartes==1.1.0 (for plotting map)
+  + folium==0.10.0
 
+# 作者其他相似Repo
+
+1. [numpy_101](https://github.com/YLTsai0609/numpy_101)
+2. [regax tutorial](https://github.com/YLTsai0609/regexp_tutorial)
