@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.3.4
+#       jupytext_version: 1.11.5
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -25,10 +25,18 @@
 # ### hints
 # > 12, 18, 22, 24, 28, 29, 30, 33, 56, 59, 66, 67, 72
 
+# %config Completer.use_jedi = False
+
 # # Pandas 101
 
+# +
 import pandas as pd
 from IPython.core.display import display
+
+pd.set_option('display.max_columns', 500)
+pd.set_option('display.width', 1000)
+pd.set_option('display.max_colwidth', None)
+# -
 
 # 1. How to import pandas and check the version? 
 print(pd.__version__)
@@ -1174,6 +1182,303 @@ df = pd.DataFrame({
 
 # %%time
 df.sort_values(by=['key_1','key_2','key_3','value_1']).groupby(by=['key_1','key_2','key_3','value_1']).head(1)
+
+# +
+# pandas sending request
+
+# 6 pandas udf return Null used for sending request to get images
+# return string for pandas_udf
+# https://stackoverflow.com/questions/65694026/spark-exception-error-using-pandas-udf-with-logical-statement
+from typing import Union
+import requests
+import base64
+
+def get_img_binary(url : str) -> Union[str,None]:
+    import requests
+    import base64
+    resp = requests.get(url, timeout=10)
+    if resp.status_code == 200:
+        return base64.encodebytes(resp.content)
+    else:
+        return None
+
+data = {
+    'article_id' : [14431, 14431, 14431, 67789, 67789],
+    'img_url' :[
+        'https://pic.pimg.tw/happy78/1528543947-685380499_n.jpg',
+        'https://pic.pimg.tw/happy78/1528543947-3623_n.jpg',
+        'https://pic.pimg.tw/happy78/1528543962-2265924582_n.jpg',
+        'https://pic.pimg.tw/happy78/1528543962-4007835890_n.jpg',
+        'https://pic.pimg.tw/happy78/1528543962-45890_n.jpg'
+        ]
+}
+
+df = pd.DataFrame(data)
+
+df['img_b64_str'] = df['img_url'].apply(get_img_binary)
+
+# -
+
+# %%timeit
+get_img_binary('https://pic.pimg.tw/happy78/1528543947-685380499_n.jpg')
+
+# %%timeit 
+df['img_b64_str'] = df['img_url'].apply(get_img_binary)
+
+display(df)
+
+# +
+# >>> def exception_handler(request, exception):
+# ...    print("Request failed")
+
+# >>> reqs = [
+# ...    grequests.get('http://httpbin.org/delay/1', timeout=0.001),
+# ...    grequests.get('http://fakedomain/'),
+# ...    grequests.get('http://httpbin.org/status/500')]
+# >>> grequests.map(reqs, exception_handler=exception_handler)
+# Request failed
+# Request failed
+# [None, None, <Response [500]>]
+
+# +
+
+
+def get_request_async(s : pd.Series) -> pd.Series:
+    
+    def exception_handler(request, exception):
+        print("Request failed")
+
+    links = s.tolist()
+    print(links)
+#     reqs = (grequests.get(url, timeout=5) for url in links) # generator
+#     resp_list = grequests.map(reqs) # async sending request happens here
+    
+    resp_list = [requests.get(url, timeout=5) for url in links] # generator
+    print(resp_list)
+
+get_request_async(df['img_url'])
+# +
+
+# json normalize (unpack the nested keys)
+# https://pandas.pydata.org/docs/reference/api/pandas.json_normalize.html#pandas.json_normalize
+# new in 0.25.0
+
+data = [
+    {"id": 1, "name": {"first": "Coleen", "last": "Volk"}},
+    {"name": {"given": "Mark", "family": "Regner"}},
+    {"id": 2, "name": "Faye Raker"},
+]
+
+display(
+    pd.json_normalize(data),
+    pd.json_normalize(data,max_level=0),
+)
+
+
+# +
+data = [
+    # list of record, level 1
+    {
+        "state": "Florida",
+        "shortname": "FL",
+        # mata
+        "info": {"governor": "Rick Scott"},
+        # list of record, level 2
+        "counties": [
+            {"name": "Dade", "population": 12345},
+            {"name": "Broward", "population": 40000},
+            {"name": "Palm Beach", "population": 60000},
+        ],
+    },
+    {
+        "state": "Ohio",
+        "shortname": "OH",
+        "info": {"governor": "John Kasich"},
+        "counties": [
+            {"name": "Summit", "population": 1234},
+            {"name": "Cuyahoga", "population": 1337},
+        ],
+    },
+]
+
+
+display(
+    pd.json_normalize(data,record_path=None),
+    pd.json_normalize(data,record_path='counties'),
+    pd.json_normalize(data,record_path='counties',record_prefix='counties.'),
+    pd.json_normalize(
+        data,
+        record_path='counties',
+        record_prefix='counties.',
+        meta=['info'], # if you dont want to unpact that
+    ),
+)
+# +
+# json normalize on any json data?
+
+feteched = {'data': {'popularTitles': {'totalCount': 6994,
+   'pageInfo': {'startCursor': 'MQ==',
+    'endCursor': 'Mw==',
+    'hasPreviousPage': False,
+    'hasNextPage': True,
+    '__typename': 'PageInfo'},
+   'edges': [{'cursor': 'MQ==',
+     'node': {'id': 'ts112728',
+      'objectId': 112728,
+      'objectType': 'SHOW',
+      'content': {'title': 'The Rocketeer',
+       'fullPath': '/tw/節目/the-rocketeer',
+       'scoring': {'imdbScore': 4.9, '__typename': 'Scoring'},
+       'posterUrl': '/poster/172395129/{profile}/the-rocketeer.{format}',
+       'backdrops': [{'backdropUrl': '/backdrop/161588208/{profile}',
+         '__typename': 'Backdrop'},
+        {'backdropUrl': '/backdrop/161588209/{profile}',
+         '__typename': 'Backdrop'},
+        {'backdropUrl': '/backdrop/213331337/{profile}',
+         '__typename': 'Backdrop'},
+        {'backdropUrl': '/backdrop/213331336/{profile}',
+         '__typename': 'Backdrop'},
+        {'backdropUrl': '/backdrop/161588212/{profile}',
+         '__typename': 'Backdrop'}],
+       '__typename': 'ShowContent'},
+      'likelistEntry': None,
+      'dislikelistEntry': None,
+      'watchlistEntry': None,
+      'watchNowOffer': {'id': 'b2Z8dHMxMTI3Mjg6VFc6MzM3OmZsYXRyYXRlOmhk',
+       'standardWebURL': 'https://disneyplus.bn5x.net/c/1206980/705874/9358?u=https%3A%2F%2Fwww.disneyplus.com%2Fseries%2Fthe-rocketeer%2F2oK6c9XCQPcY&subId3=justappsvod',
+       'package': {'packageId': 337,
+        'clearName': 'Disney Plus',
+        '__typename': 'Package'},
+       'retailPrice': None,
+       'retailPriceValue': None,
+       'lastChangeRetailPriceValue': None,
+       'currency': 'TWD',
+       'presentationType': 'HD',
+       'monetizationType': 'FLATRATE',
+       '__typename': 'Offer'},
+      'seenState': {'seenEpisodeCount': 0,
+       'progress': 0,
+       '__typename': 'ShowSeenState'},
+      '__typename': 'Show'},
+     '__typename': 'PopularTitlesEdge'},
+    {'cursor': 'Mg==',
+     'node': {'id': 'ts87172',
+      'objectId': 87172,
+      'objectType': 'SHOW',
+      'content': {'title': "The Exorcist's Meter",
+       'fullPath': '/tw/節目/the-exorcists-meter',
+       'scoring': {'imdbScore': None, '__typename': 'Scoring'},
+       'posterUrl': '/poster/103567979/{profile}/the-exorcists-meter.{format}',
+       'backdrops': [{'backdropUrl': '/backdrop/158488578/{profile}',
+         '__typename': 'Backdrop'},
+        {'backdropUrl': '/backdrop/158488579/{profile}',
+         '__typename': 'Backdrop'},
+        {'backdropUrl': '/backdrop/103567980/{profile}',
+         '__typename': 'Backdrop'},
+        {'backdropUrl': '/backdrop/179703450/{profile}',
+         '__typename': 'Backdrop'}],
+       '__typename': 'ShowContent'},
+      'likelistEntry': None,
+      'dislikelistEntry': None,
+      'watchlistEntry': None,
+      'watchNowOffer': {'id': 'b2Z8dHM4NzE3MjpUVzo2MjQ6ZmxhdHJhdGU6aGQ=',
+       'standardWebURL': 'https://www.kktv.me/play/04000024010001',
+       'package': {'packageId': 624,
+        'clearName': 'KKTV',
+        '__typename': 'Package'},
+       'retailPrice': None,
+       'retailPriceValue': None,
+       'lastChangeRetailPriceValue': None,
+       'currency': 'TWD',
+       'presentationType': 'HD',
+       'monetizationType': 'FLATRATE',
+       '__typename': 'Offer'},
+      'seenState': {'seenEpisodeCount': 0,
+       'progress': 0,
+       '__typename': 'ShowSeenState'},
+      '__typename': 'Show'},
+     '__typename': 'PopularTitlesEdge'},
+    {'cursor': 'Mw==',
+     'node': {'id': 'ts297132',
+      'objectId': 297132,
+      'objectType': 'SHOW',
+      'content': {'title': 'Brave Animated Series',
+       'fullPath': '/tw/節目/brave-animated-series',
+       'scoring': {'imdbScore': None, '__typename': 'Scoring'},
+       'posterUrl': '/poster/247331835/{profile}/brave-animated-series.{format}',
+       'backdrops': [{'backdropUrl': '/backdrop/250293512/{profile}',
+         '__typename': 'Backdrop'}],
+       '__typename': 'ShowContent'},
+      'likelistEntry': None,
+      'dislikelistEntry': None,
+      'watchlistEntry': None,
+      'watchNowOffer': {'id': 'b2Z8dHMyOTcxMzI6VFc6ODpmbGF0cmF0ZTpzZA==',
+       'standardWebURL': 'http://www.netflix.com/title/81471856',
+       'package': {'packageId': 8,
+        'clearName': 'Netflix',
+        '__typename': 'Package'},
+       'retailPrice': None,
+       'retailPriceValue': None,
+       'lastChangeRetailPriceValue': None,
+       'currency': 'TWD',
+       'presentationType': 'SD',
+       'monetizationType': 'FLATRATE',
+       '__typename': 'Offer'},
+      'seenState': {'seenEpisodeCount': 0,
+       'progress': 0,
+       '__typename': 'ShowSeenState'},
+      '__typename': 'Show'},
+     '__typename': 'PopularTitlesEdge'}],
+   '__typename': 'PopularTitlesConnection'}}}
+
+
+pdf = pd.json_normalize(feteched, record_path=['data','popularTitles','edges'])
+pdf
+
+
+# +
+# build json schema
+# https://pandas.pydata.org/docs/reference/api/pandas.io.json.build_table_schema.html#pandas.io.json.build_table_schema
+
+df = pd.DataFrame(
+    {'A': [1, 2, 3],
+     'B': ['a', 'b', 'c'],
+     'C': pd.date_range('2016-01-01', freq='d', periods=3),
+    }, index=pd.Index(range(3), name='idx'))
+
+# useful when converting data via API or for different application
+
+display(
+    pd.io.json.build_table_schema(df),
+    pd.io.json.build_table_schema(pd.json_normalize(data)),
+)
+
+# +
+# Array Types (string types in pandas)
+
+data = {
+    'scalar':[1,2],
+    'array':[
+        ['b','c'],
+        ['d','e']
+    ]
+}
+
+schema = {'scalar':'int','array':'string[pyarrow]'}
+
+pdf = pd.DataFrame(data,
+#                    dtype=schema # waiting for further improvement in data types
+                  )
+pdf.info()
+pdf
+# -
+
+
+
+
+
+
+
 
 # # Some functionality you should know...
 
